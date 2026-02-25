@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backrooms - Prototype</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+        background: black;
+        overflow: hidden;
+        color: white;
+    }
+
+    #menu {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: black;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+    }
+
+    #menu h1 {
+        font-size: 3em;
+        margin-bottom: 20px;
+        letter-spacing: 5px;
+    }
+
+    #menu button {
+        padding: 15px 40px;
+        font-size: 18px;
+        background: yellow;
+        border: none;
+        cursor: pointer;
+    }
+
+    #gameCanvas {
+        display: none;
+        background: #bfae4b;
+    }
+
+    #hud {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        display: none;
+    }
+
+    .bar {
+        width: 200px;
+        height: 15px;
+        background: #222;
+        margin-bottom: 10px;
+    }
+
+    .fill {
+        height: 100%;
+        background: lime;
+        width: 100%;
+    }
+
+    #sanityFill {
+        background: red;
+    }
+</style>
+</head>
+
+<body>
+
+<div id="menu">
+    <h1>BACKROOMS</h1>
+    <button onclick="startGame()">INICIAR</button>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<div id="hud">
+    <div class="bar">
+        <div id="flashlightFill" class="fill"></div>
+    </div>
+    <div class="bar">
+        <div id="sanityFill" class="fill"></div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let flashlight = 100;
+let sanity = 100;
+let gameRunning = false;
+
+let player = {
+    x: 0,
+    y: 0,
+    speed: 3
+};
+
+let keys = {};
+
+document.addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
+document.addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
+
+function startGame() {
+    document.getElementById("menu").style.display = "none";
+    canvas.style.display = "block";
+    document.getElementById("hud").style.display = "block";
+    gameRunning = true;
+    requestAnimationFrame(gameLoop);
+}
+
+function update() {
+    if(keys["w"]) player.y -= player.speed;
+    if(keys["s"]) player.y += player.speed;
+    if(keys["a"]) player.x -= player.speed;
+    if(keys["d"]) player.x += player.speed;
+
+    flashlight -= 0.02;
+    sanity -= 0.01;
+
+    if(flashlight < 0) flashlight = 0;
+    if(sanity < 0) sanity = 0;
+
+    document.getElementById("flashlightFill").style.width = flashlight + "%";
+    document.getElementById("sanityFill").style.width = sanity + "%";
+}
+
+function draw() {
+    ctx.fillStyle = "#c7b44f";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // padrão de "carpete"
+    for(let i = 0; i < 200; i++) {
+        ctx.fillStyle = "#bfae4b";
+        ctx.fillRect(Math.random() * canvas.width,
+                     Math.random() * canvas.height,
+                     2, 2);
+    }
+
+    // efeito escuro da lanterna
+    if(flashlight > 0) {
+        let gradient = ctx.createRadialGradient(
+            canvas.width/2,
+            canvas.height/2,
+            50,
+            canvas.width/2,
+            canvas.height/2,
+            300
+        );
+
+        gradient.addColorStop(0, "rgba(0,0,0,0)");
+        gradient.addColorStop(1, "rgba(0,0,0,0.9)");
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } else {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
+function gameLoop() {
+    if(!gameRunning) return;
+
+    update();
+    draw();
+
+    if(sanity <= 0) {
+        alert("Você enlouqueceu...");
+        location.reload();
+    }
+
+    requestAnimationFrame(gameLoop);
+}
+</script>
+
+</body>
+</html>
