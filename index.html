@@ -3,133 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Backrooms - O Jogo</title>
+    <title>BACKROOMS - Nível 0: Os Escritórios Infinitos</title>
     <link rel="stylesheet" href="css/style.css">
-    <!-- Fonte para dar um ar mais misterioso -->
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@300;400;700&family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <!-- Tela de título -->
-        <header class="game-header">
+    <!-- Tela de Loading -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <h1 class="loading-title">BACKROOMS</h1>
+            <div class="loading-bar">
+                <div class="loading-progress" id="loadingProgress"></div>
+            </div>
+            <p class="loading-text" id="loadingText">Iniciando simulação dimensional...</p>
+        </div>
+    </div>
+
+    <!-- Tela de Menu Principal -->
+    <div class="menu-screen" id="menuScreen">
+        <div class="menu-container">
             <h1 class="game-title">BACKROOMS</h1>
-            <p class="game-subtitle">Você está preso em um labirinto infinito de escritórios amarelados...</p>
-        </header>
+            <p class="game-subtitle">Nível 0 - Os Escritórios Infinitos</p>
+            
+            <div class="menu-buttons">
+                <button class="menu-btn primary" id="startNewGame">
+                    <span class="btn-icon">🎮</span>
+                    NOVA PARTIDA
+                </button>
+                <button class="menu-btn" id="continueGame" disabled>
+                    <span class="btn-icon">⏸️</span>
+                    CONTINUAR
+                </button>
+                <button class="menu-btn" id="menuSettings">
+                    <span class="btn-icon">⚙️</span>
+                    CONFIGURAÇÕES
+                </button>
+                <button class="menu-btn" id="menuCredits">
+                    <span class="btn-icon">📜</span>
+                    CRÉDITOS
+                </button>
+            </div>
 
-        <!-- Área principal do jogo -->
-        <main class="game-container">
-            <!-- Canvas do jogo (se for usar gráficos) -->
-            <canvas id="gameCanvas" class="game-canvas"></canvas>
+            <div class="menu-footer">
+                <p>Use WASD ou Setas para se mover | E para interagir</p>
+                <p class="warning-text">Alta exposição pode causar perda de sanidade</p>
+            </div>
+        </div>
+    </div>
 
-            <!-- Painel de status -->
-            <div class="status-panel">
-                <div class="status-item">
-                    <span class="status-label">Sanidade</span>
-                    <div class="progress-bar">
-                        <div class="progress-fill sanity" style="width: 85%"></div>
+    <!-- Tela de Créditos -->
+    <div class="credits-screen" id="creditsScreen">
+        <div class="credits-container">
+            <h2>CRÉDITOS</h2>
+            <div class="credits-content">
+                <p class="credit-section">Desenvolvimento</p>
+                <p>Brenninho123</p>
+                
+                <p class="credit-section">Inspiração</p>
+                <p>Backrooms - The Found Footage</p>
+                <p>Kane Pixels</p>
+                
+                <p class="credit-section">Agradecimentos</p>
+                <p>Comunidade Backrooms</p>
+                <p>Todos que mantêm a chama acesa</p>
+            </div>
+            <button class="menu-btn" id="backToMenu">VOLTAR</button>
+        </div>
+    </div>
+
+    <!-- Interface do Jogo -->
+    <div class="game-interface" id="gameInterface" style="display: none;">
+        <!-- Efeitos de tela -->
+        <div class="screen-effects" id="screenEffects">
+            <div class="vignette"></div>
+            <div class="noise"></div>
+            <div class="scanlines"></div>
+            <div class="flicker" id="flickerEffect"></div>
+        </div>
+
+        <!-- HUD Principal -->
+        <div class="hud-container">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-group">
+                    <div class="status-item">
+                        <span class="status-icon">🧠</span>
+                        <div class="status-bar-container">
+                            <div class="status-bar-fill sanity" id="sanityBar" style="width: 100%"></div>
+                        </div>
+                        <span class="status-value" id="sanityValue">100%</span>
+                    </div>
+
+                    <div class="status-item">
+                        <span class="status-icon">⚡</span>
+                        <div class="status-bar-container">
+                            <div class="status-bar-fill energy" id="energyBar" style="width: 100%"></div>
+                        </div>
+                        <span class="status-value" id="energyValue">100%</span>
                     </div>
                 </div>
-                <div class="status-item">
-                    <span class="status-label">Nível</span>
-                    <span class="status-value" id="levelDisplay">0</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">Itens</span>
-                    <span class="status-value" id="itemsCount">0</span>
+
+                <div class="level-indicator">
+                    <span class="level-icon">📊</span>
+                    <span class="level-text" id="levelDisplay">NÍVEL 0</span>
                 </div>
             </div>
 
-            <!-- Área de texto/jornal -->
-            <div class="journal-area">
-                <div class="journal-header">
-                    <span class="journal-title">Diário</span>
-                    <span class="journal-date">Dia 1</span>
+            <!-- Área Principal do Jogo -->
+            <div class="game-area">
+                <!-- Canvas do Jogo (Visão Primeira Pessoa) -->
+                <canvas id="gameCanvas" class="game-canvas"></canvas>
+
+                <!-- Mini-mapa -->
+                <div class="minimap" id="minimap">
+                    <div class="minimap-header">
+                        <span>🗺️ MAPA</span>
+                        <span class="minimap-coords" id="playerCoords">X:0 Y:0</span>
+                    </div>
+                    <div class="minimap-canvas-container">
+                        <canvas id="minimapCanvas" width="150" height="150"></canvas>
+                    </div>
                 </div>
-                <div class="journal-content" id="journalText">
-                    <p>Você acorda em uma sala de escritório amarelada...</p>
-                    <p>O zumbido das lâmpadas fluorescentes preenche o silêncio.</p>
+
+                <!-- Diário/Jornal -->
+                <div class="journal-panel" id="journalPanel">
+                    <div class="journal-header">
+                        <span>📔 DIÁRIO</span>
+                        <span class="journal-time" id="gameTime">00:00</span>
+                    </div>
+                    <div class="journal-content" id="journalContent">
+                        <p class="journal-entry">▶ Você acorda nos Backrooms...</p>
+                        <p class="journal-entry">▶ O zumbido é ensurdecedor...</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Controles do jogo -->
-            <div class="controls-panel">
-                <button class="control-btn move" data-direction="up">⬆️</button>
-                <div class="move-row">
-                    <button class="control-btn move" data-direction="left">⬅️</button>
-                    <button class="control-btn action" id="interactBtn">👆</button>
-                    <button class="control-btn move" data-direction="right">➡️</button>
+            <!-- Painel de Ações Rápidas -->
+            <div class="quick-actions">
+                <div class="inventory-quick" id="inventoryQuick">
+                    <div class="quick-slot" data-slot="1">
+                        <span class="slot-key">1</span>
+                        <span class="slot-item" id="slot1">🔦</span>
+                    </div>
+                    <div class="quick-slot" data-slot="2">
+                        <span class="slot-key">2</span>
+                        <span class="slot-item" id="slot2">💊</span>
+                    </div>
+                    <div class="quick-slot" data-slot="3">
+                        <span class="slot-key">3</span>
+                        <span class="slot-item" id="slot3">🔋</span>
+                    </div>
+                    <div class="quick-slot" data-slot="4">
+                        <span class="slot-key">4</span>
+                        <span class="slot-item" id="slot4">📻</span>
+                    </div>
                 </div>
-                <button class="control-btn move" data-direction="down">⬇️</button>
+
+                <div class="action-hint" id="actionHint">
+                    <span class="hint-key">E</span>
+                    <span class="hint-text">Interagir</span>
+                </div>
             </div>
 
-            <!-- Menu de ações -->
-            <div class="action-menu">
-                <button class="action-btn" id="inventoryBtn">
-                    <span class="btn-icon">🎒</span>
-                    Inventário
-                </button>
-                <button class="action-btn" id="mapBtn">
-                    <span class="btn-icon">🗺️</span>
-                    Mapa
-                </button>
-                <button class="action-btn" id="settingsBtn">
-                    <span class="btn-icon">⚙️</span>
-                    Configurações
-                </button>
+            <!-- Controles de Movimento (Mobile) -->
+            <div class="mobile-controls" id="mobileControls">
+                <div class="movement-pad">
+                    <button class="move-btn" data-dir="up">⬆️</button>
+                    <div class="move-row">
+                        <button class="move-btn" data-dir="left">⬅️</button>
+                        <button class="action-btn-mobile" id="mobileInteract">👆</button>
+                        <button class="move-btn" data-dir="right">➡️</button>
+                    </div>
+                    <button class="move-btn" data-dir="down">⬇️</button>
+                </div>
             </div>
-        </main>
+        </div>
 
-        <!-- Rodapé -->
-        <footer class="game-footer">
-            <p>Use as setas para se mover | Espaço para interagir</p>
-        </footer>
+        <!-- Painel de Inventário (Modal) -->
+        <div class="inventory-panel" id="inventoryPanel">
+            <div class="inventory-header">
+                <h3>INVENTÁRIO</h3>
+                <button class="close-panel" id="closeInventory">✕</button>
+            </div>
+            <div class="inventory-grid" id="inventoryGrid">
+                <!-- Itens serão inseridos via JS -->
+            </div>
+            <div class="inventory-stats">
+                <div class="stat">Capacidade: <span id="inventoryCapacity">0/8</span></div>
+                <div class="stat">Peso: <span id="inventoryWeight">0kg</span></div>
+            </div>
+        </div>
+
+        <!-- Sistema de Diálogo/Notas -->
+        <div class="note-display" id="noteDisplay" style="display: none;">
+            <div class="note-content">
+                <div class="note-text" id="noteText"></div>
+                <button class="note-close" id="closeNote">FECHAR</button>
+            </div>
+        </div>
+
+        <!-- Sistema de Alerta -->
+        <div class="alert-system" id="alertSystem"></div>
     </div>
 
-    <!-- Modal de Inventário (inicialmente escondido) -->
-    <div class="modal" id="inventoryModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Inventário</h2>
-                <button class="close-modal">&times;</button>
+    <!-- Tela de Game Over -->
+    <div class="gameover-screen" id="gameoverScreen" style="display: none;">
+        <div class="gameover-container">
+            <h1 class="gameover-title">VOCÊ SE PERDEU</h1>
+            <p class="gameover-subtitle" id="gameoverReason">Sua sanidade chegou ao fim...</p>
+            
+            <div class="gameover-stats">
+                <div class="stat-row">
+                    <span>Tempo sobrevivido:</span>
+                    <span id="survivalTime">00:00</span>
+                </div>
+                <div class="stat-row">
+                    <span>Salas exploradas:</span>
+                    <span id="roomsExplored">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Itens coletados:</span>
+                    <span id="itemsCollected">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Entidades encontradas:</span>
+                    <span id="entitiesEncountered">0</span>
+                </div>
             </div>
-            <div class="modal-body">
-                <ul class="inventory-list">
-                    <li class="inventory-item empty">Vazio</li>
-                </ul>
+
+            <div class="gameover-buttons">
+                <button class="menu-btn primary" id="restartGame">
+                    <span class="btn-icon">🔄</span>
+                    TENTAR NOVAMENTE
+                </button>
+                <button class="menu-btn" id="backToMenuGameOver">
+                    <span class="btn-icon">🏠</span>
+                    MENU PRINCIPAL
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Configurações -->
-    <div class="modal" id="settingsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Configurações</h2>
-                <button class="close-modal">&times;</button>
+    <!-- Tela de Configurações -->
+    <div class="settings-screen" id="settingsScreen" style="display: none;">
+        <div class="settings-container">
+            <h2>CONFIGURAÇÕES</h2>
+            
+            <div class="settings-group">
+                <h3>ÁUDIO</h3>
+                <div class="setting-item">
+                    <span>Efeitos Sonoros</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="soundToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span>Música Ambiente</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="musicToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span>Volume</span>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="70">
+                </div>
             </div>
-            <div class="modal-body">
+
+            <div class="settings-group">
+                <h3>GRÁFICOS</h3>
                 <div class="setting-item">
-                    <label>Efeitos Sonoros</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" checked>
+                    <span>Efeitos de Tela</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="effectsToggle" checked>
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
                 <div class="setting-item">
-                    <label>Música</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" checked>
+                    <span>Brilho</span>
+                    <input type="range" id="brightnessSlider" min="50" max="150" value="100">
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <h3>JOGABILIDADE</h3>
+                <div class="setting-item">
+                    <span>Dificuldade</span>
+                    <select id="difficultySelect">
+                        <option value="easy">Fácil</option>
+                        <option value="normal" selected>Normal</option>
+                        <option value="hard">Difícil</option>
+                        <option value="nightmare">Pesadelo</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span>Mostrar Dicas</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="hintsToggle" checked>
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
-                <div class="setting-item">
-                    <label>Volume</label>
-                    <input type="range" min="0" max="100" value="70">
-                </div>
+            </div>
+
+            <div class="settings-buttons">
+                <button class="menu-btn primary" id="saveSettings">SALVAR</button>
+                <button class="menu-btn" id="closeSettings">VOLTAR</button>
             </div>
         </div>
     </div>
 
+    <!-- Sistema de Áudio (escondido) -->
+    <audio id="ambientSound" loop preload="auto">
+        <source src="assets/sounds/ambient.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="footstepSound" preload="auto">
+        <source src="assets/sounds/footstep.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="entitySound" preload="auto">
+        <source src="assets/sounds/entity.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="pickupSound" preload="auto">
+        <source src="assets/sounds/pickup.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="js/game.js"></script>
+    <script src="js/entities.js"></script>
+    <script src="js/items.js"></script>
     <script src="js/ui.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
