@@ -19,7 +19,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     
     <style>
-        /* ===== ROOT VARIABLES - ULTIMATE BACKROOMS PALETTE ===== */
+        /* ===== ROOT VARIABLES ===== */
         :root {
             --backrooms-wall: #e8d9b5;
             --backrooms-wall-dark: #b8a882;
@@ -62,11 +62,54 @@
         body {
             font-family: 'Inter', sans-serif;
             color: var(--backrooms-yellow);
-            touch-action: none; /* Prevent touch scrolling */
+            touch-action: none;
             -ms-touch-action: none;
         }
 
-        /* ===== ULTIMATE FOUND FOOTAGE EFFECT LAYERS ===== */
+        /* ===== FPS, MEMORY, OS COUNTER ===== */
+        .system-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #0f0;
+            font-family: 'VT323', monospace;
+            font-size: 12px;
+            padding: 8px 12px;
+            border: 1px solid #0f0;
+            z-index: 200000;
+            pointer-events: none;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            backdrop-filter: blur(2px);
+            border-radius: 0;
+            line-height: 1.5;
+        }
+
+        .system-info div {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .system-info i {
+            width: 20px;
+            color: var(--backrooms-yellow);
+        }
+
+        .fps-value {
+            color: #0f0;
+        }
+
+        .memory-value {
+            color: #ff0;
+        }
+
+        .os-value {
+            color: #0ff;
+        }
+
+        /* ===== FOUND FOOTAGE EFFECT LAYERS ===== */
         .effect-layer {
             position: fixed;
             top: 0;
@@ -78,7 +121,6 @@
             mix-blend-mode: overlay;
         }
 
-        /* Layer 1: Heavy Static Noise */
         .static-heavy {
             position: fixed;
             top: 0;
@@ -100,7 +142,6 @@
             100% { background-position: 0 0; opacity: 0.25; }
         }
 
-        /* Layer 2: CRT Scanlines - Authentic */
         .scanlines-heavy {
             position: fixed;
             top: 0;
@@ -119,7 +160,6 @@
             z-index: 100002;
         }
 
-        /* Layer 3: VHS Tape Distortion */
         .vhs-distortion {
             position: fixed;
             top: 0;
@@ -144,7 +184,6 @@
             100% { transform: translateX(100%) skewX(0deg); }
         }
 
-        /* Layer 4: Heavy Vignette */
         .vignette-heavy {
             position: fixed;
             top: 0;
@@ -156,7 +195,6 @@
             opacity: 0.9;
         }
 
-        /* Layer 5: Fluorescent Flicker */
         .flicker-heavy {
             position: fixed;
             top: 0;
@@ -182,7 +220,6 @@
             100% { opacity: 0.03; }
         }
 
-        /* Layer 6: Vertical Roll */
         .vertical-roll {
             position: fixed;
             top: 0;
@@ -206,7 +243,6 @@
             100% { transform: translateY(100%); }
         }
 
-        /* Layer 7: Tape Glitches */
         .glitch-layer {
             position: fixed;
             top: 0;
@@ -238,37 +274,6 @@
             25% { transform: translateX(0); }
         }
 
-        /* ===== FPS COUNTER - FOUND FOOTAGE STYLE ===== */
-        .fps-counter {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            color: #0f0;
-            font-family: 'VT323', monospace;
-            font-size: 14px;
-            padding: 6px 12px;
-            border: 1px solid #0f0;
-            z-index: 200000;
-            pointer-events: none;
-            letter-spacing: 1px;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-            backdrop-filter: blur(2px);
-            border-radius: 0;
-        }
-
-        .fps-counter::before {
-            content: '●';
-            color: #0f0;
-            margin-right: 6px;
-            animation: fpsPulse 1s infinite;
-        }
-
-        @keyframes fpsPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
         /* ===== TAPE COUNTER ===== */
         .tape-counter {
             position: fixed;
@@ -291,7 +296,7 @@
             color: var(--backrooms-carpet);
         }
 
-        /* ===== LOADING SCREEN - ULTIMATE VHS ===== */
+        /* ===== LOADING SCREEN - CORRIGIDO ===== */
         .loading-screen {
             position: fixed;
             top: 0;
@@ -300,11 +305,18 @@
             height: 100%;
             background: #000;
             z-index: 500000;
-            display: flex;
+            display: flex !important; /* Forçando display */
             justify-content: center;
             align-items: center;
             transition: opacity 2s ease;
             font-family: 'VT323', monospace;
+            opacity: 1;
+            visibility: visible !important;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
         .vhs-preview {
@@ -456,7 +468,7 @@
             50% { border-color: #f0e68c; color: #f0e68c; }
         }
 
-        /* ===== INTRO CINEMATIC - ULTIMATE FOUND FOOTAGE ===== */
+        /* ===== INTRO CINEMATIC ===== */
         .intro-cinematic {
             position: fixed;
             top: 0;
@@ -560,7 +572,7 @@
             filter: sepia(0.3) brightness(0.8) contrast(1.2);
         }
 
-        /* ===== MAIN MENU - AUTHENTIC ===== */
+        /* ===== MAIN MENU ===== */
         .menu-container {
             position: fixed;
             top: 0;
@@ -727,7 +739,7 @@
             font-family: 'VT323', monospace;
         }
 
-        /* ===== MOBILE JOYSTICK - ONLY VISIBLE ON MOBILE ===== */
+        /* ===== MOBILE JOYSTICK ===== */
         .joystick-container {
             position: fixed;
             bottom: 40px;
@@ -735,7 +747,7 @@
             width: 150px;
             height: 150px;
             z-index: 20000;
-            display: none; /* Hidden by default, shown only on mobile */
+            display: none;
             filter: drop-shadow(0 0 20px rgba(240, 230, 140, 0.3));
         }
 
@@ -792,7 +804,6 @@
         .dir-left { left: 5px; top: 50%; transform: translateY(-50%); }
         .dir-right { right: 5px; top: 50%; transform: translateY(-50%); }
 
-        /* Mobile action button */
         .action-button-mobile {
             position: fixed;
             bottom: 40px;
@@ -803,7 +814,7 @@
             border: 3px solid var(--backrooms-carpet);
             border-radius: 50%;
             z-index: 20000;
-            display: none; /* Hidden by default, shown only on mobile */
+            display: none;
             justify-content: center;
             align-items: center;
             color: var(--backrooms-yellow);
@@ -819,7 +830,6 @@
             margin-left: 5px;
         }
 
-        /* Show mobile controls only on touch devices */
         @media (hover: none) and (pointer: coarse) {
             .joystick-container {
                 display: block;
@@ -906,7 +916,6 @@
             border: 1px solid rgba(240, 230, 140, 0.2);
         }
 
-        /* Toggle Switch */
         .toggle {
             position: relative;
             display: inline-block;
@@ -952,7 +961,6 @@
             background-color: #fff;
         }
 
-        /* Range Slider */
         .range-slider {
             width: 200px;
             height: 6px;
@@ -1091,7 +1099,6 @@
             letter-spacing: 2px;
         }
 
-        /* Hide on mobile to avoid clutter with joystick */
         @media (hover: none) and (pointer: coarse) {
             .game-hud {
                 bottom: 200px;
@@ -1099,7 +1106,6 @@
             }
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .menu-title {
                 font-size: 3.5rem;
@@ -1142,11 +1148,23 @@
                 right: 20px;
                 font-size: 2rem;
             }
+            
+            .system-info {
+                font-size: 10px;
+                padding: 6px 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- ===== ULTIMATE FOUND FOOTAGE EFFECT LAYERS ===== -->
+    <!-- ===== SYSTEM INFO (FPS, MEMORY, OS) ===== -->
+    <div class="system-info" id="systemInfo">
+        <div><i class="fas fa-tachometer-alt"></i> FPS: <span class="fps-value" id="fpsValue">60</span></div>
+        <div><i class="fas fa-memory"></i> MEMORY: <span class="memory-value" id="memoryValue">0 MB</span></div>
+        <div><i class="fas fa-laptop"></i> OS: <span class="os-value" id="osValue">Windows</span></div>
+    </div>
+
+    <!-- ===== FOUND FOOTAGE EFFECT LAYERS ===== -->
     <div class="effect-layer">
         <div class="static-heavy" id="staticLayer"></div>
         <div class="scanlines-heavy"></div>
@@ -1157,11 +1175,10 @@
         <div class="glitch-layer" id="glitchLayer"></div>
     </div>
 
-    <!-- ===== HUD ELEMENTS ===== -->
-    <div class="fps-counter" id="fpsCounter">FPS: <span id="fpsValue">60</span></div>
+    <!-- ===== TAPE COUNTER ===== -->
     <div class="tape-counter" id="tapeCounter"><i class="fas fa-tape"></i> TAPE: <span id="tapeTime">23:14</span></div>
 
-    <!-- ===== MOBILE JOYSTICK (ONLY VISIBLE ON TOUCH DEVICES) ===== -->
+    <!-- ===== MOBILE JOYSTICK ===== -->
     <div class="joystick-container" id="joystickContainer">
         <div class="joystick-base">
             <div class="joystick-direction dir-up">▲</div>
@@ -1180,7 +1197,7 @@
         <span>ACT</span>
     </div>
 
-    <!-- ===== LOADING SCREEN ===== -->
+    <!-- ===== LOADING SCREEN (CORRIGIDO) ===== -->
     <div class="loading-screen" id="loadingScreen">
         <div class="vhs-preview"></div>
         <div class="tracking-lines"></div>
@@ -1399,17 +1416,38 @@
     </audio>
 
     <script>
-        // ===== FPS COUNTER CLASS =====
-        class FPSCounter {
+        // ===== SYSTEM INFO (FPS, MEMORY, OS) =====
+        class SystemInfo {
             constructor() {
                 this.fps = 60;
                 this.fpsElement = document.getElementById('fpsValue');
+                this.memoryElement = document.getElementById('memoryValue');
+                this.osElement = document.getElementById('osValue');
                 this.lastFrameTime = performance.now();
                 this.frameCount = 0;
-                this.update();
+                
+                // Detect OS
+                this.detectOS();
+                
+                // Start updates
+                this.updateFPS();
+                this.updateMemory();
             }
 
-            update() {
+            detectOS() {
+                const userAgent = navigator.userAgent;
+                let os = "Unknown";
+                
+                if (userAgent.indexOf("Win") !== -1) os = "Windows";
+                else if (userAgent.indexOf("Mac") !== -1) os = "macOS";
+                else if (userAgent.indexOf("Linux") !== -1) os = "Linux";
+                else if (userAgent.indexOf("Android") !== -1) os = "Android";
+                else if (userAgent.indexOf("iOS") !== -1 || userAgent.indexOf("iPhone") !== -1 || userAgent.indexOf("iPad") !== -1) os = "iOS";
+                
+                this.osElement.textContent = os;
+            }
+
+            updateFPS() {
                 const now = performance.now();
                 const delta = now - this.lastFrameTime;
                 this.frameCount++;
@@ -1431,11 +1469,33 @@
                     this.frameCount = 0;
                 }
 
-                requestAnimationFrame(() => this.update());
+                requestAnimationFrame(() => this.updateFPS());
+            }
+
+            updateMemory() {
+                if (performance.memory) {
+                    const memory = Math.round(performance.memory.usedJSHeapSize / (1024 * 1024));
+                    const total = Math.round(performance.memory.jsHeapSizeLimit / (1024 * 1024));
+                    this.memoryElement.textContent = `${memory} MB / ${total} MB`;
+                    
+                    // Change color based on memory usage
+                    const percent = (memory / total) * 100;
+                    if (percent > 80) {
+                        this.memoryElement.style.color = '#ff0000';
+                    } else if (percent > 50) {
+                        this.memoryElement.style.color = '#ffff00';
+                    } else {
+                        this.memoryElement.style.color = '#00ff00';
+                    }
+                } else {
+                    this.memoryElement.textContent = 'N/A';
+                }
+                
+                setTimeout(() => this.updateMemory(), 2000);
             }
         }
 
-        // ===== MOBILE JOYSTICK CONTROLLER =====
+        // ===== MOBILE JOYSTICK =====
         class MobileJoystick {
             constructor() {
                 this.container = document.getElementById('joystickContainer');
@@ -1445,7 +1505,7 @@
                 this.force = 0;
                 this.direction = { x: 0, y: 0 };
                 
-                if (this.container && this.thumb) {
+                if (this.container && this.thumb && window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
                     this.init();
                 }
             }
@@ -1476,7 +1536,6 @@
                 let deltaX = e.center.x - centerX;
                 let deltaY = e.center.y - centerY;
                 
-                // Limit to joystick radius
                 const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
                 const maxDistance = rect.width / 2 - 10;
                 
@@ -1485,10 +1544,8 @@
                     deltaY = (deltaY / distance) * maxDistance;
                 }
                 
-                // Move thumb
                 this.thumb.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(1.1)`;
                 
-                // Calculate direction and force
                 this.force = Math.min(distance / maxDistance, 1);
                 this.angle = Math.atan2(deltaY, deltaX);
                 
@@ -1497,7 +1554,6 @@
                     y: deltaY / maxDistance
                 };
                 
-                // Trigger movement in game
                 if (window.game) {
                     window.game.handleJoystickMove(this.direction);
                 }
@@ -1522,13 +1578,14 @@
                 this.camera = null;
                 this.renderer = null;
                 this.startTime = Date.now();
-                this.fpsCounter = new FPSCounter();
+                this.systemInfo = new SystemInfo();
                 this.mobileJoystick = null;
                 this.playerPosition = { x: 0, y: 0, z: 0 };
                 this.playerRotation = 0;
                 this.sanity = 100;
                 this.tapeTime = 23 * 60 + 14; // 23:14
                 this.moveSpeed = 0.05;
+                this.gameActive = false;
                 
                 this.initialize();
             }
@@ -1537,7 +1594,7 @@
                 this.initThree();
                 this.initLoading();
                 this.initEventListeners();
-                this.initMobileControls();
+                this.mobileJoystick = new MobileJoystick();
                 this.startLoadingSequence();
                 
                 // Start tape countdown
@@ -1552,34 +1609,26 @@
             }
 
             initThree() {
-                // Three.js Scene - Authentic Backrooms atmosphere
                 this.scene = new THREE.Scene();
                 this.scene.background = new THREE.Color(0x1a150e);
                 this.scene.fog = new THREE.FogExp2(0x1a150e, 0.015);
                 
-                // Camera
                 this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
                 this.camera.position.set(0, 1.6, 5);
                 
-                // Renderer
                 this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
                 this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 document.getElementById('canvas-container').appendChild(this.renderer.domElement);
                 
-                // Lights - Fluorescent style
                 const ambientLight = new THREE.AmbientLight(0x404030);
                 this.scene.add(ambientLight);
                 
-                // Create authentic Backrooms environment
                 this.createBackroomsWorld();
-                
-                // Start animation
                 this.animate();
             }
 
             createBackroomsWorld() {
-                // Materials
                 const wallMaterial = new THREE.MeshStandardMaterial({ 
                     color: 0xe8d9b5,
                     emissive: 0x221c10,
@@ -1593,15 +1642,9 @@
                     emissive: 0x2a0a15
                 });
 
-                const trimMaterial = new THREE.MeshStandardMaterial({
-                    color: 0xc9b37e,
-                    roughness: 0.6
-                });
-
-                // Create infinite grid of offices
+                // Create infinite grid
                 for (let x = -8; x <= 8; x++) {
                     for (let z = -8; z <= 8; z++) {
-                        // Floor tiles with carpet pattern
                         const floorTile = new THREE.Mesh(
                             new THREE.BoxGeometry(0.98, 0.1, 0.98),
                             floorMaterial
@@ -1609,18 +1652,6 @@
                         floorTile.position.set(x * 2, -0.05, z * 2);
                         this.scene.add(floorTile);
                         
-                        // Add carpet texture lines
-                        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x5a1429 });
-                        for (let i = -0.4; i <= 0.4; i+=0.8) {
-                            const points = [];
-                            points.push(new THREE.Vector3(x * 2 + i, 0, z * 2 - 0.9));
-                            points.push(new THREE.Vector3(x * 2 + i, 0, z * 2 + 0.9));
-                            const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-                            const line = new THREE.Line(lineGeometry, lineMaterial);
-                            this.scene.add(line);
-                        }
-                        
-                        // Walls with random placement
                         if (Math.random() > 0.6) {
                             const wall = new THREE.Mesh(
                                 new THREE.BoxGeometry(2, 2.5, 0.2),
@@ -1630,121 +1661,36 @@
                             this.scene.add(wall);
                         }
                         
-                        // Fluorescent lights
                         if (Math.random() > 0.7) {
                             const light = new THREE.PointLight(0xfff0c0, 0.8, 4);
                             light.position.set(x * 2, 2.2, z * 2);
                             this.scene.add(light);
-                            
-                            // Light fixture
-                            const fixture = new THREE.Mesh(
-                                new THREE.BoxGeometry(0.4, 0.1, 1.2),
-                                new THREE.MeshStandardMaterial({ color: 0xcccccc, emissive: 0x332200 })
-                            );
-                            fixture.position.set(x * 2, 2.1, z * 2);
-                            this.scene.add(fixture);
-                        }
-                        
-                        // Random office furniture
-                        if (Math.random() > 0.8) {
-                            // Desk
-                            const desk = new THREE.Mesh(
-                                new THREE.BoxGeometry(1, 0.8, 0.6),
-                                new THREE.MeshStandardMaterial({ color: 0x8b5a2b })
-                            );
-                            desk.position.set(x * 2 + 0.5, 0.4, z * 2 + 0.3);
-                            this.scene.add(desk);
                         }
                     }
                 }
                 
-                // Add floating particles (dust)
+                // Dust particles
                 const particleGeometry = new THREE.BufferGeometry();
                 const particleCount = 1000;
                 const positions = new Float32Array(particleCount * 3);
-                const colors = new Float32Array(particleCount * 3);
                 
                 for (let i = 0; i < particleCount * 3; i += 3) {
                     positions[i] = (Math.random() - 0.5) * 40;
                     positions[i+1] = (Math.random() - 0.5) * 8;
                     positions[i+2] = (Math.random() - 0.5) * 40;
-                    
-                    // Yellowish dust
-                    colors[i] = 1.0;
-                    colors[i+1] = 0.9;
-                    colors[i+2] = 0.5;
                 }
                 
                 particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
                 
                 const particleMaterial = new THREE.PointsMaterial({
+                    color: 0xfff0c0,
                     size: 0.03,
-                    vertexColors: true,
                     transparent: true,
-                    opacity: 0.3,
-                    blending: THREE.AdditiveBlending
+                    opacity: 0.3
                 });
                 
-                const particles = new THREE.Points(particleGeometry, particleMaterial);
-                this.scene.add(particles);
-                this.particles = particles;
-            }
-
-            initMobileControls() {
-                // Only initialize if touch device
-                if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
-                    this.mobileJoystick = new MobileJoystick();
-                    
-                    // Action button
-                    document.getElementById('actionButtonMobile').addEventListener('click', () => {
-                        this.interact();
-                    });
-                }
-            }
-
-            handleJoystickMove(direction) {
-                // Move player based on joystick direction
-                if (this.camera) {
-                    // Forward/backward movement
-                    this.camera.position.x += direction.x * this.moveSpeed;
-                    this.camera.position.z += direction.y * this.moveSpeed;
-                    
-                    // Update player position
-                    this.playerPosition.x = this.camera.position.x;
-                    this.playerPosition.z = this.camera.position.z;
-                    
-                    // Add head bobbing effect
-                    this.camera.position.y = 1.6 + Math.sin(Date.now() * 0.01) * 0.03;
-                    
-                    // Play footstep sound occasionally
-                    if (Math.random() > 0.99) {
-                        const footstep = document.getElementById('footstepAudio');
-                        footstep.volume = 0.2;
-                        footstep.play();
-                    }
-                }
-            }
-
-            handleJoystickEnd() {
-                // Reset head position
-                if (this.camera) {
-                    this.camera.position.y = 1.6;
-                }
-            }
-
-            interact() {
-                console.log('Interacting');
-                // Visual feedback
-                const btn = document.getElementById('actionButtonMobile');
-                btn.style.transform = 'scale(0.9)';
-                setTimeout(() => {
-                    btn.style.transform = 'scale(1)';
-                }, 100);
-                
-                // Random sanity effect
-                this.sanity = Math.max(0, this.sanity - 2);
-                this.updateSanity();
+                this.particles = new THREE.Points(particleGeometry, particleMaterial);
+                this.scene.add(this.particles);
             }
 
             initLoading() {
@@ -1782,7 +1728,7 @@
                         clearInterval(interval);
                         
                         setTimeout(() => {
-                            this.loadingScreen.style.opacity = '0';
+                            this.loadingScreen.classList.add('hidden');
                             setTimeout(() => {
                                 this.loadingScreen.style.display = 'none';
                                 this.startIntro();
@@ -1792,17 +1738,14 @@
                     
                     this.loadingProgress.style.width = progress + '%';
                     
-                    // Update loading message
                     messageIndex = Math.floor((progress / 100) * this.loadingMessages.length);
                     if (messageIndex >= this.loadingMessages.length) {
                         messageIndex = this.loadingMessages.length - 1;
                     }
                     this.loadingMessage.textContent = this.loadingMessages[messageIndex];
                     
-                    // Update tracking status
                     this.trackingStatus.textContent = Math.floor(30 + progress * 0.7) + '%';
                     
-                    // Update time
                     const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
                     const minutes = Math.floor(elapsed / 60);
                     const seconds = elapsed % 60;
@@ -1814,14 +1757,12 @@
                 const intro = document.getElementById('introCinematic');
                 intro.style.display = 'block';
                 
-                // Update timestamp
                 setInterval(() => {
                     const date = new Date();
                     document.getElementById('introTimestamp').textContent = 
                         `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
                 }, 1000);
                 
-                // Update tape counter
                 setInterval(() => {
                     const minutes = Math.floor(this.tapeTime / 60);
                     const seconds = this.tapeTime % 60;
@@ -1829,7 +1770,6 @@
                         `TAPE REMAINING: ${minutes}:${seconds.toString().padStart(2, '0')}`;
                 }, 1000);
                 
-                // Intro lines animation
                 const lines = [
                     document.getElementById('introLine1'),
                     document.getElementById('introLine2'),
@@ -1848,7 +1788,6 @@
                     }
                 });
                 
-                // Animate with authentic horror timing
                 const delays = [500, 2500, 4500, 6500, 8500, 10500, 12500, 14500];
                 
                 lines.forEach((line, index) => {
@@ -1861,7 +1800,6 @@
                                 ease: "power2.out"
                             });
                             
-                            // Hide previous line
                             if (index > 0) {
                                 gsap.to(lines[index - 1], {
                                     opacity: 0,
@@ -1874,7 +1812,6 @@
                     }, delays[index]);
                 });
                 
-                // End intro
                 setTimeout(() => {
                     gsap.to(intro, {
                         opacity: 0,
@@ -1891,24 +1828,20 @@
                 const menu = document.getElementById('menuContainer');
                 menu.classList.add('visible');
                 
-                // Start the hum
                 const theHum = document.getElementById('theHum');
                 theHum.volume = 0.3;
                 theHum.play().catch(e => console.log('Audio autoplay blocked'));
                 
-                // Start static
                 const staticAudio = document.getElementById('staticAudio');
                 staticAudio.volume = 0.2;
                 staticAudio.play().catch(e => console.log('Static autoplay blocked'));
             }
 
             initEventListeners() {
-                // Start Game
                 document.getElementById('startGameBtn').addEventListener('click', () => {
                     this.startGame();
                 });
                 
-                // Settings
                 document.getElementById('settingsBtn').addEventListener('click', () => {
                     document.getElementById('settingsModal').classList.add('active');
                 });
@@ -1917,7 +1850,6 @@
                     document.getElementById('settingsModal').classList.remove('active');
                 });
                 
-                // Credits
                 document.getElementById('creditsBtn').addEventListener('click', () => {
                     document.getElementById('creditsModal').classList.add('active');
                 });
@@ -1926,7 +1858,6 @@
                     document.getElementById('creditsModal').classList.remove('active');
                 });
                 
-                // Settings controls
                 document.getElementById('soundToggle').addEventListener('change', (e) => {
                     const theHum = document.getElementById('theHum');
                     if (e.target.checked) {
@@ -1950,7 +1881,6 @@
                     theHum.volume = e.target.value / 100;
                 });
                 
-                // Effect controls
                 document.getElementById('staticSlider').addEventListener('input', (e) => {
                     document.getElementById('staticLayer').style.opacity = e.target.value / 100 * 0.3;
                 });
@@ -1964,7 +1894,10 @@
                     document.querySelector('.vignette-heavy').style.opacity = e.target.checked ? '0.9' : '0';
                 });
                 
-                // Keyboard controls for desktop
+                document.getElementById('actionButtonMobile').addEventListener('click', () => {
+                    this.interact();
+                });
+                
                 document.addEventListener('keydown', (e) => {
                     if (!this.gameActive) return;
                     
@@ -2000,7 +1933,6 @@
                     }
                 });
                 
-                // Window resize
                 window.addEventListener('resize', () => {
                     if (this.camera && this.renderer) {
                         this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -2010,24 +1942,57 @@
                 });
             }
 
+            handleJoystickMove(direction) {
+                if (!this.gameActive || !this.camera) return;
+                
+                this.camera.position.x += direction.x * this.moveSpeed;
+                this.camera.position.z += direction.y * this.moveSpeed;
+                
+                this.playerPosition.x = this.camera.position.x;
+                this.playerPosition.z = this.camera.position.z;
+                
+                this.camera.position.y = 1.6 + Math.sin(Date.now() * 0.01) * 0.03;
+                
+                if (Math.random() > 0.99) {
+                    const footstep = document.getElementById('footstepAudio');
+                    footstep.volume = 0.2;
+                    footstep.play();
+                }
+            }
+
+            handleJoystickEnd() {
+                if (this.camera) {
+                    this.camera.position.y = 1.6;
+                }
+            }
+
+            interact() {
+                if (!this.gameActive) return;
+                
+                const btn = document.getElementById('actionButtonMobile');
+                btn.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    btn.style.transform = 'scale(1)';
+                }, 100);
+                
+                this.sanity = Math.max(0, this.sanity - 2);
+                this.updateSanity();
+            }
+
             startGame() {
-                // Hide menu
                 document.getElementById('menuContainer').classList.remove('visible');
                 
-                // Show game HUD
                 const gameHud = document.getElementById('gameHud');
                 gameHud.classList.add('visible');
                 
                 this.gameActive = true;
                 
-                // Start sanity drain
                 setInterval(() => {
                     if (!this.gameActive) return;
                     
                     this.sanity = Math.max(0, this.sanity - 0.1);
                     this.updateSanity();
                     
-                    // Random location names
                     const locations = [
                         'THE INFINITE OFFICE',
                         'YELLOW WALLPAPER SECTOR',
@@ -2035,8 +2000,7 @@
                         'ABANDONED DESK AREA',
                         'THE HUMMING CORRIDOR',
                         'COORDINATES: ???',
-                        'ENTITY PROXIMITY UNKNOWN',
-                        'THE NO-CLIP ZONE'
+                        'ENTITY PROXIMITY UNKNOWN'
                     ];
                     
                     document.getElementById('locationIndicator').innerHTML = 
@@ -2047,13 +2011,11 @@
                     }
                 }, 1000);
                 
-                // Random entity sounds
                 setInterval(() => {
                     if (Math.random() > 0.7 && this.gameActive) {
                         this.sanity -= 5;
                         this.updateSanity();
                         
-                        // Show glitch
                         document.getElementById('glitchLayer').style.opacity = '0.5';
                         setTimeout(() => {
                             document.getElementById('glitchLayer').style.opacity = '0.2';
@@ -2069,7 +2031,6 @@
                 sanityFill.style.width = this.sanity + '%';
                 sanityPercent.textContent = Math.floor(this.sanity) + '%';
                 
-                // Change color based on sanity
                 if (this.sanity < 30) {
                     sanityFill.style.background = 'linear-gradient(90deg, #8b1e3f, #4a0f20)';
                 } else if (this.sanity < 60) {
@@ -2086,12 +2047,10 @@
             animate() {
                 requestAnimationFrame(() => this.animate());
                 
-                // Animate particles
                 if (this.particles) {
                     this.particles.rotation.y += 0.0001;
                 }
                 
-                // Camera sway
                 if (this.gameActive && this.camera) {
                     this.camera.rotation.y += Math.sin(Date.now() * 0.001) * 0.001;
                 }
@@ -2100,9 +2059,9 @@
             }
         }
 
-        // Initialize game
+        // Initialize game when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
-            window.game = new BackroomsGames();
+            window.game = new BackroomsGame();
         });
     </script>
 </body>
