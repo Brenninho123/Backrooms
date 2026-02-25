@@ -1,0 +1,51 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background: black;
+    font-family: Arial;
+}
+
+#menu {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: black;
+    color: yellow;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+#menu button {
+    padding: 15px 40px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+#hud {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: none;
+}
+
+.bar {
+    width: 200px;
+    height: 15px;
+    background: #222;
+    margin-bottom: 10px;
+}
+
+#flashFill {
+    height: 100%;
+    background: lime;
+    width: 100%;
+}
+
+#sanityFill {
+    height: 100%;
+    background: red;
+    width: 100%;
+}
