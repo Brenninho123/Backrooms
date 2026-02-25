@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BACKROOMS: LEVEL 0 - LIMINAL HORROR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>BACKROOMS: LEVEL 0 - FOUND FOOTAGE [LIMINAL HORROR]</title>
     
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Major+Mono+Display&family=VT323&family=Special+Elite&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Major+Mono+Display&family=VT323&family=Special+Elite&family=Creepster&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Three.js for 3D -->
@@ -15,21 +15,30 @@
     <!-- GSAP for animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     
+    <!-- Hammer.js for touch gestures -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    
     <style>
-        /* ===== ROOT VARIABLES - AUTHENTIC BACKROOMS COLOR PALETTE ===== */
+        /* ===== ROOT VARIABLES - ULTIMATE BACKROOMS PALETTE ===== */
         :root {
-            --backrooms-yellow: #f0e68c;
-            --backrooms-yellow-dark: #c9b37e;
             --backrooms-wall: #e8d9b5;
             --backrooms-wall-dark: #b8a882;
-            --backrooms-carpet: #c41e3a;
-            --backrooms-carpet-dark: #8b0000;
+            --backrooms-wall-darker: #8a7a5e;
+            --backrooms-carpet: #8b1e3f;
+            --backrooms-carpet-dark: #5a1429;
+            --backrooms-carpet-blood: #4a0f20;
+            --backrooms-trim: #c9b37e;
             --backrooms-hum: #ffffe0;
-            --backrooms-shadow: #2a2418;
             --backrooms-flicker: #fffacd;
+            --backrooms-shadow: #1a150e;
+            --backrooms-black: #0a0804;
+            --backrooms-yellow: #f0e68c;
+            --backrooms-yellow-dim: #c9b37e;
+            --backrooms-entity: #2a2418;
             --glow-yellow: rgba(240, 230, 140, 0.3);
-            --glow-red: rgba(196, 30, 58, 0.2);
-            --scanline-color: rgba(255, 255, 255, 0.03);
+            --glow-red: rgba(139, 30, 63, 0.3);
+            --scanline-primary: rgba(255, 255, 200, 0.03);
+            --static-white: rgba(255, 255, 255, 0.05);
         }
 
         /* ===== GLOBAL STYLES ===== */
@@ -38,55 +47,61 @@
             padding: 0;
             box-sizing: border-box;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            background: #000;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #000;
             color: var(--backrooms-yellow);
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            cursor: crosshair;
+            touch-action: none; /* Prevent touch scrolling */
+            -ms-touch-action: none;
         }
 
-        /* ===== AUTHENTIC BACKROOMS FOUND FOOTAGE EFFECTS ===== */
-        .found-footage-layer {
+        /* ===== ULTIMATE FOUND FOOTAGE EFFECT LAYERS ===== */
+        .effect-layer {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 10000;
+            z-index: 100000;
             mix-blend-mode: overlay;
         }
 
-        /* VHS Static Noise */
-        .static-overlay {
+        /* Layer 1: Heavy Static Noise */
+        .static-heavy {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0px, transparent 1px);
-            opacity: 0.15;
-            animation: staticNoise 0.2s infinite;
-            pointer-events: none;
-            z-index: 10001;
+            background: repeating-radial-gradient(circle at 30% 40%, rgba(255,255,255,0.1) 0px, transparent 2px);
+            opacity: 0.25;
+            animation: staticHeavy 0.15s infinite;
+            z-index: 100001;
         }
 
-        @keyframes staticNoise {
-            0% { background-position: 0 0; opacity: 0.15; }
-            20% { background-position: 2px -2px; opacity: 0.18; }
-            40% { background-position: -2px 2px; opacity: 0.12; }
-            60% { background-position: 1px 1px; opacity: 0.16; }
-            80% { background-position: -1px -1px; opacity: 0.14; }
-            100% { background-position: 0 0; opacity: 0.15; }
+        @keyframes staticHeavy {
+            0% { background-position: 0 0; opacity: 0.25; }
+            20% { background-position: 3px -3px; opacity: 0.3; }
+            40% { background-position: -3px 3px; opacity: 0.2; }
+            60% { background-position: 2px 2px; opacity: 0.28; }
+            80% { background-position: -2px -2px; opacity: 0.22; }
+            100% { background-position: 0 0; opacity: 0.25; }
         }
 
-        /* Scanlines - Authentic CRT Effect */
-        .scanlines {
+        /* Layer 2: CRT Scanlines - Authentic */
+        .scanlines-heavy {
             position: fixed;
             top: 0;
             left: 0;
@@ -95,18 +110,17 @@
             background: repeating-linear-gradient(
                 0deg,
                 rgba(0, 0, 0, 0) 0px,
-                rgba(0, 0, 0, 0.1) 1px,
-                rgba(0, 0, 0, 0.3) 2px,
-                rgba(0, 0, 0, 0.1) 3px,
+                rgba(0, 0, 0, 0.15) 1px,
+                rgba(0, 0, 0, 0.4) 2px,
+                rgba(0, 0, 0, 0.15) 3px,
                 rgba(0, 0, 0, 0) 4px
             );
-            pointer-events: none;
-            z-index: 10002;
-            opacity: 0.3;
+            opacity: 0.5;
+            z-index: 100002;
         }
 
-        /* VHS Tape Artifacts */
-        .vhs-artifacts {
+        /* Layer 3: VHS Tape Distortion */
+        .vhs-distortion {
             position: fixed;
             top: 0;
             left: 0;
@@ -114,62 +128,62 @@
             height: 100%;
             background: linear-gradient(90deg, 
                 transparent 0%, 
-                rgba(255, 255, 255, 0.02) 20%, 
-                transparent 40%,
-                rgba(255, 255, 0, 0.02) 60%,
-                transparent 80%
+                rgba(255, 200, 100, 0.03) 30%, 
+                transparent 50%,
+                rgba(100, 200, 255, 0.03) 70%,
+                transparent 100%
             );
-            animation: vhsWobble 8s infinite linear;
-            pointer-events: none;
-            z-index: 10003;
+            animation: vhsDistort 6s infinite linear;
+            z-index: 100003;
             opacity: 0.4;
         }
 
-        @keyframes vhsWobble {
+        @keyframes vhsDistort {
             0% { transform: translateX(-100%) skewX(0deg); }
-            50% { transform: translateX(0%) skewX(2deg); }
+            50% { transform: translateX(0%) skewX(3deg); }
             100% { transform: translateX(100%) skewX(0deg); }
         }
 
-        /* Vignette - Dark corners like old footage */
-        .vignette {
+        /* Layer 4: Heavy Vignette */
+        .vignette-heavy {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.7) 100%);
-            pointer-events: none;
-            z-index: 10004;
+            background: radial-gradient(circle at center, transparent 20%, rgba(0, 0, 0, 0.9) 100%);
+            z-index: 100004;
+            opacity: 0.9;
         }
 
-        /* Flickering lights effect - Authentic Backrooms */
-        .flicker-layer {
+        /* Layer 5: Fluorescent Flicker */
+        .flicker-heavy {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(255, 255, 200, 0.03);
-            animation: flickerLights 0.5s infinite;
-            pointer-events: none;
-            z-index: 10005;
+            animation: flickerBackrooms 0.3s infinite;
+            z-index: 100005;
             mix-blend-mode: screen;
         }
 
-        @keyframes flickerLights {
+        @keyframes flickerBackrooms {
             0% { opacity: 0.03; }
-            25% { opacity: 0.08; }
-            30% { opacity: 0.02; }
-            35% { opacity: 0.07; }
-            40% { opacity: 0.03; }
-            90% { opacity: 0.04; }
-            95% { opacity: 0.09; }
+            20% { opacity: 0.12; }
+            25% { opacity: 0.02; }
+            30% { opacity: 0.15; }
+            35% { opacity: 0.03; }
+            80% { opacity: 0.05; }
+            85% { opacity: 0.18; }
+            92% { opacity: 0.03; }
+            95% { opacity: 0.25; }
             100% { opacity: 0.03; }
         }
 
-        /* Vertical hold effect */
-        .vertical-hold {
+        /* Layer 6: Vertical Roll */
+        .vertical-roll {
             position: fixed;
             top: 0;
             left: 0;
@@ -178,14 +192,13 @@
             background: repeating-linear-gradient(
                 180deg,
                 transparent 0px,
-                transparent 2px,
-                rgba(0, 0, 0, 0.1) 3px,
-                transparent 4px
+                transparent 4px,
+                rgba(0, 0, 0, 0.1) 5px,
+                transparent 6px
             );
-            animation: verticalRoll 10s linear infinite;
-            pointer-events: none;
-            z-index: 10006;
-            opacity: 0.2;
+            animation: verticalRoll 8s linear infinite;
+            z-index: 100006;
+            opacity: 0.3;
         }
 
         @keyframes verticalRoll {
@@ -193,38 +206,92 @@
             100% { transform: translateY(100%); }
         }
 
-        /* ===== FPS COUNTER - STEAM OVERLAY STYLE ===== */
+        /* Layer 7: Tape Glitches */
+        .glitch-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 0, 0, 0.02) 10%,
+                transparent 20%,
+                rgba(0, 255, 0, 0.02) 30%,
+                transparent 40%,
+                rgba(0, 0, 255, 0.02) 50%,
+                transparent 60%
+            );
+            animation: glitchShift 2s infinite;
+            z-index: 100007;
+            opacity: 0.2;
+            mix-blend-mode: screen;
+        }
+
+        @keyframes glitchShift {
+            0%, 100% { transform: translateX(0); }
+            5% { transform: translateX(-2px); }
+            10% { transform: translateX(2px); }
+            15% { transform: translateX(-1px); }
+            20% { transform: translateX(1px); }
+            25% { transform: translateX(0); }
+        }
+
+        /* ===== FPS COUNTER - FOUND FOOTAGE STYLE ===== */
         .fps-counter {
             position: fixed;
             top: 10px;
             left: 10px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             color: #0f0;
             font-family: 'VT323', monospace;
             font-size: 14px;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 6px 12px;
             border: 1px solid #0f0;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
-            z-index: 20000;
+            z-index: 200000;
             pointer-events: none;
-            backdrop-filter: blur(2px);
             letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            backdrop-filter: blur(2px);
+            border-radius: 0;
         }
 
         .fps-counter::before {
-            content: '■';
+            content: '●';
             color: #0f0;
-            margin-right: 5px;
-            animation: fpsBlink 1s infinite;
+            margin-right: 6px;
+            animation: fpsPulse 1s infinite;
         }
 
-        @keyframes fpsBlink {
+        @keyframes fpsPulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.3; }
         }
 
-        /* ===== LOADING SCREEN - AUTHENTIC VHS STYLE ===== */
+        /* ===== TAPE COUNTER ===== */
+        .tape-counter {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--backrooms-yellow);
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+            padding: 6px 12px;
+            border: 1px solid var(--backrooms-yellow);
+            z-index: 200000;
+            pointer-events: none;
+            letter-spacing: 2px;
+            backdrop-filter: blur(2px);
+        }
+
+        .tape-counter i {
+            margin-right: 5px;
+            color: var(--backrooms-carpet);
+        }
+
+        /* ===== LOADING SCREEN - ULTIMATE VHS ===== */
         .loading-screen {
             position: fixed;
             top: 0;
@@ -232,7 +299,7 @@
             width: 100%;
             height: 100%;
             background: #000;
-            z-index: 30000;
+            z-index: 500000;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -240,112 +307,156 @@
             font-family: 'VT323', monospace;
         }
 
-        .vhs-tracking {
+        .vhs-preview {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.5);
-            animation: trackingWobble 3s infinite;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(240,230,140,0.1) 0%, transparent 60%);
         }
 
-        @keyframes trackingWobble {
-            0% { transform: translateX(-100%); }
-            50% { transform: translateX(0%); }
-            100% { transform: translateX(100%); }
+        .tracking-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 20%, transparent 40%, rgba(255,255,255,0.5) 60%, transparent 80%);
+            animation: trackingMove 2s infinite;
+        }
+
+        @keyframes trackingMove {
+            0% { top: -20px; }
+            100% { top: 120%; }
         }
 
         .loading-content {
             text-align: center;
-            width: 600px;
+            width: 650px;
             max-width: 90%;
-            border: 2px solid var(--backrooms-yellow);
-            padding: 2rem;
+            border: 3px solid var(--backrooms-yellow);
+            padding: 3rem 2rem;
             position: relative;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 0 50px rgba(240, 230, 140, 0.2);
+            z-index: 10;
         }
 
         .loading-content::before {
             content: '';
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 1px solid rgba(240, 230, 140, 0.3);
             pointer-events: none;
         }
 
-        .vhs-label {
-            font-size: 0.8rem;
+        .vhs-badge {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: var(--backrooms-carpet);
             color: var(--backrooms-yellow);
-            text-align: left;
-            margin-bottom: 1rem;
-            opacity: 0.7;
-            letter-spacing: 2px;
+            padding: 5px 15px;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            border: 1px solid var(--backrooms-yellow);
         }
 
         .loading-title {
             font-family: 'Special Elite', cursive;
-            font-size: 3rem;
+            font-size: 5rem;
             color: var(--backrooms-yellow);
-            text-shadow: 0 0 10px var(--glow-yellow);
-            margin-bottom: 2rem;
-            letter-spacing: 5px;
+            text-shadow: 
+                0 0 20px var(--glow-yellow),
+                3px 3px 0 var(--backrooms-carpet);
+            margin-bottom: 1rem;
+            letter-spacing: 10px;
+            animation: loadingPulse 2s infinite;
         }
 
-        .loading-subtitle {
-            font-size: 1rem;
-            color: #666;
-            margin-bottom: 2rem;
+        @keyframes loadingPulse {
+            0%, 100% { text-shadow: 0 0 20px var(--glow-yellow), 3px 3px 0 var(--backrooms-carpet); }
+            50% { text-shadow: 0 0 40px var(--glow-yellow), 3px 3px 0 var(--backrooms-carpet); }
         }
 
-        .loading-progress-container {
+        .loading-sub {
+            font-size: 1.2rem;
+            color: var(--backrooms-carpet);
+            margin-bottom: 2rem;
+            font-family: 'VT323', monospace;
+            letter-spacing: 4px;
+        }
+
+        .progress-container {
             width: 100%;
-            height: 20px;
+            height: 30px;
             background: #111;
-            border: 1px solid var(--backrooms-yellow);
-            margin: 1rem 0;
+            border: 2px solid var(--backrooms-yellow);
+            margin: 2rem 0;
             position: relative;
             overflow: hidden;
         }
 
-        .loading-progress {
+        .progress-fill {
             width: 0%;
             height: 100%;
             background: repeating-linear-gradient(
                 45deg,
                 var(--backrooms-yellow) 0px,
-                var(--backrooms-yellow) 10px,
-                var(--backrooms-yellow-dark) 10px,
-                var(--backrooms-yellow-dark) 20px
+                var(--backrooms-yellow) 15px,
+                var(--backrooms-yellow-dim) 15px,
+                var(--backrooms-yellow-dim) 30px
             );
             transition: width 0.3s ease;
-            box-shadow: 0 0 20px var(--glow-yellow);
+            box-shadow: 0 0 30px var(--glow-yellow);
         }
 
-        .loading-stats {
+        .loading-stats-grid {
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
-            color: #888;
+            color: #666;
+            font-size: 1rem;
             margin: 1rem 0;
+            padding: 1rem 0;
+            border-top: 1px dashed rgba(240,230,140,0.3);
+            border-bottom: 1px dashed rgba(240,230,140,0.3);
+        }
+
+        .loading-message {
+            color: var(--backrooms-carpet);
+            font-size: 1.3rem;
+            margin: 2rem 0;
+            min-height: 3rem;
+            text-transform: uppercase;
+            animation: messageFlicker 0.5s infinite;
+        }
+
+        @keyframes messageFlicker {
+            0%, 100% { opacity: 1; }
+            95% { opacity: 0.8; }
+            96% { opacity: 0.3; }
+            97% { opacity: 1; }
         }
 
         .loading-warning {
-            color: var(--backrooms-carpet);
+            color: #8b1e3f;
             font-size: 1rem;
+            border: 1px solid #8b1e3f;
+            padding: 0.5rem;
             margin-top: 2rem;
-            animation: warningBlink 2s infinite;
+            animation: warningPulse 2s infinite;
         }
 
-        @keyframes warningBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        @keyframes warningPulse {
+            0%, 100% { border-color: #8b1e3f; color: #8b1e3f; }
+            50% { border-color: #f0e68c; color: #f0e68c; }
         }
 
-        /* ===== INTRO CINEMATIC - AUTHENTIC FOUND FOOTAGE ===== */
+        /* ===== INTRO CINEMATIC - ULTIMATE FOUND FOOTAGE ===== */
         .intro-cinematic {
             position: fixed;
             top: 0;
@@ -353,8 +464,18 @@
             width: 100%;
             height: 100%;
             background: #000;
-            z-index: 25000;
+            z-index: 400000;
             display: none;
+        }
+
+        .intro-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+            z-index: 10;
         }
 
         .intro-timestamp {
@@ -363,20 +484,20 @@
             right: 20px;
             font-family: 'VT323', monospace;
             color: var(--backrooms-yellow);
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             z-index: 20;
-            opacity: 0.7;
+            text-shadow: 0 0 10px #000;
         }
 
-        .intro-counter {
+        .intro-tape-counter {
             position: absolute;
             bottom: 20px;
             left: 20px;
             font-family: 'VT323', monospace;
             color: var(--backrooms-carpet);
-            font-size: 1rem;
+            font-size: 1.2rem;
             z-index: 20;
-            opacity: 0.5;
+            text-shadow: 0 0 10px #000;
         }
 
         .intro-text-container {
@@ -384,46 +505,51 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80%;
-            max-width: 800px;
-            z-index: 20;
+            width: 90%;
+            max-width: 1000px;
+            z-index: 30;
             text-align: center;
         }
 
         .intro-line {
             font-family: 'VT323', monospace;
             color: var(--backrooms-yellow);
-            font-size: 2rem;
-            text-shadow: 0 0 10px var(--glow-yellow);
-            margin: 1rem 0;
+            font-size: 2.5rem;
+            text-shadow: 
+                0 0 20px var(--glow-yellow),
+                2px 2px 0 #000;
+            margin: 1.5rem 0;
             opacity: 0;
-            transform: translateY(20px);
-            line-height: 1.4;
+            transform: translateY(30px);
+            line-height: 1.5;
         }
 
         .intro-line.large {
-            font-size: 4rem;
+            font-size: 5rem;
             font-family: 'Special Elite', cursive;
-            color: var(--backrooms-yellow-dark);
+            color: var(--backrooms-yellow-dim);
+            text-shadow: 
+                0 0 30px var(--glow-yellow),
+                4px 4px 0 var(--backrooms-carpet);
         }
 
         .intro-line.small {
-            font-size: 1.2rem;
-            color: #888;
+            font-size: 1.5rem;
+            color: #aaa;
         }
 
         .intro-line.glitch {
-            animation: glitchText 0.5s infinite;
+            animation: glitchIntro 2s infinite;
         }
 
-        @keyframes glitchText {
-            0%, 100% { text-shadow: 2px 0 0 red, -2px 0 0 blue; }
-            25% { text-shadow: -2px 0 0 red, 2px 0 0 blue; }
-            50% { text-shadow: 2px 0 0 blue, -2px 0 0 red; }
-            75% { text-shadow: -2px 0 0 blue, 2px 0 0 red; }
+        @keyframes glitchIntro {
+            0%, 100% { transform: skew(0deg, 0deg); opacity: 1; text-shadow: 2px 0 0 red, -2px 0 0 blue; }
+            95% { transform: skew(2deg, 1deg); opacity: 0.9; }
+            96% { transform: skew(-2deg, -1deg); opacity: 0.8; }
+            97% { transform: skew(0deg, 0deg); opacity: 1; }
         }
 
-        /* ===== 3D BACKROOMS SCENE ===== */
+        /* ===== THREE.JS CANVAS ===== */
         #canvas-container {
             position: fixed;
             top: 0;
@@ -431,10 +557,10 @@
             width: 100%;
             height: 100%;
             z-index: 1;
-            filter: contrast(1.1) brightness(0.9) sepia(0.2);
+            filter: sepia(0.3) brightness(0.8) contrast(1.2);
         }
 
-        /* ===== MAIN MENU - BACKROOMS STYLE ===== */
+        /* ===== MAIN MENU - AUTHENTIC ===== */
         .menu-container {
             position: fixed;
             top: 0;
@@ -444,11 +570,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 10000;
             opacity: 0;
             visibility: hidden;
             transition: opacity 2s ease;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(5px);
         }
 
@@ -462,21 +588,22 @@
             transform: translateY(30px);
             opacity: 0;
             transition: all 1s ease 0.5s;
-            width: 500px;
+            width: 600px;
             max-width: 90%;
-            border: 1px solid var(--backrooms-yellow);
-            padding: 3rem 2rem;
+            border: 3px solid var(--backrooms-yellow);
+            padding: 4rem 2rem;
             position: relative;
+            background: rgba(0, 0, 0, 0.7);
         }
 
         .menu-content::before {
             content: '';
             position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
-            border: 1px dashed rgba(240, 230, 140, 0.3);
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border: 1px dashed rgba(240, 230, 140, 0.4);
             pointer-events: none;
         }
 
@@ -487,55 +614,57 @@
 
         .menu-title {
             font-family: 'Special Elite', cursive;
-            font-size: 5rem;
+            font-size: 6rem;
             color: var(--backrooms-yellow);
             text-shadow: 
-                0 0 20px var(--glow-yellow),
-                2px 2px 0 var(--backrooms-carpet);
+                0 0 30px var(--glow-yellow),
+                3px 3px 0 var(--backrooms-carpet),
+                6px 6px 0 rgba(0, 0, 0, 0.8);
             margin-bottom: 0.5rem;
-            letter-spacing: 10px;
-            animation: titleFlicker 3s infinite;
+            letter-spacing: 15px;
+            animation: titleFlickerMenu 3s infinite;
         }
 
-        @keyframes titleFlicker {
-            0%, 100% { opacity: 1; }
+        @keyframes titleFlickerMenu {
+            0%, 100% { opacity: 1; text-shadow: 0 0 30px var(--glow-yellow), 3px 3px 0 var(--backrooms-carpet); }
             92% { opacity: 1; }
-            93% { opacity: 0.3; }
+            93% { opacity: 0.2; }
             94% { opacity: 1; }
-            95% { opacity: 0.5; }
+            95% { opacity: 0.4; }
             96% { opacity: 1; }
-            97% { opacity: 0.8; }
+            97% { opacity: 0.7; }
             98% { opacity: 1; }
         }
 
-        .menu-subtitle {
-            font-size: 1rem;
+        .menu-level {
+            font-size: 1.2rem;
             color: var(--backrooms-carpet);
             margin-bottom: 3rem;
             font-family: 'VT323', monospace;
-            letter-spacing: 4px;
+            letter-spacing: 5px;
         }
 
         .menu-buttons {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.2rem;
             margin-bottom: 2rem;
         }
 
         .menu-btn {
             background: transparent;
-            border: 1px solid var(--backrooms-yellow);
+            border: 2px solid var(--backrooms-yellow);
             color: var(--backrooms-yellow);
-            padding: 1rem;
-            font-size: 1.1rem;
+            padding: 1.2rem;
+            font-size: 1.3rem;
             font-family: 'VT323', monospace;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             text-transform: uppercase;
+            backdrop-filter: blur(5px);
         }
 
         .menu-btn::before {
@@ -545,7 +674,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(240, 230, 140, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(240, 230, 140, 0.3), transparent);
             transition: left 0.5s ease;
         }
 
@@ -553,6 +682,7 @@
             background: var(--backrooms-yellow);
             color: #000;
             border-color: #fff;
+            box-shadow: 0 0 30px var(--glow-yellow);
         }
 
         .menu-btn:hover::before {
@@ -563,6 +693,7 @@
             background: var(--backrooms-carpet);
             color: var(--backrooms-yellow);
             border-color: var(--backrooms-yellow);
+            font-weight: bold;
         }
 
         .menu-btn.primary:hover {
@@ -572,11 +703,17 @@
 
         .menu-warning {
             color: var(--backrooms-carpet);
-            font-size: 0.9rem;
+            font-size: 1.1rem;
             font-family: 'VT323', monospace;
             margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px dashed rgba(240, 230, 140, 0.3);
+            padding: 1rem;
+            border: 1px solid var(--backrooms-carpet);
+            animation: warningGlow 2s infinite;
+        }
+
+        @keyframes warningGlow {
+            0%, 100% { border-color: var(--backrooms-carpet); color: var(--backrooms-carpet); }
+            50% { border-color: var(--backrooms-yellow); color: var(--backrooms-yellow); }
         }
 
         .menu-footer {
@@ -586,8 +723,110 @@
             width: 100%;
             text-align: center;
             color: #444;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-family: 'VT323', monospace;
+        }
+
+        /* ===== MOBILE JOYSTICK - ONLY VISIBLE ON MOBILE ===== */
+        .joystick-container {
+            position: fixed;
+            bottom: 40px;
+            left: 40px;
+            width: 150px;
+            height: 150px;
+            z-index: 20000;
+            display: none; /* Hidden by default, shown only on mobile */
+            filter: drop-shadow(0 0 20px rgba(240, 230, 140, 0.3));
+        }
+
+        .joystick-base {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 3px solid var(--backrooms-yellow);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .joystick-base::before {
+            content: '';
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border: 1px dashed var(--backrooms-yellow);
+            border-radius: 50%;
+            opacity: 0.5;
+        }
+
+        .joystick-thumb {
+            width: 70px;
+            height: 70px;
+            background: var(--backrooms-carpet);
+            border: 2px solid var(--backrooms-yellow);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+            box-shadow: 0 0 20px var(--glow-red);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--backrooms-yellow);
+            font-size: 1.5rem;
+        }
+
+        .joystick-direction {
+            position: absolute;
+            color: var(--backrooms-yellow);
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px #000;
+        }
+
+        .dir-up { top: 5px; left: 50%; transform: translateX(-50%); }
+        .dir-down { bottom: 5px; left: 50%; transform: translateX(-50%); }
+        .dir-left { left: 5px; top: 50%; transform: translateY(-50%); }
+        .dir-right { right: 5px; top: 50%; transform: translateY(-50%); }
+
+        /* Mobile action button */
+        .action-button-mobile {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 120px;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 3px solid var(--backrooms-carpet);
+            border-radius: 50%;
+            z-index: 20000;
+            display: none; /* Hidden by default, shown only on mobile */
+            justify-content: center;
+            align-items: center;
+            color: var(--backrooms-yellow);
+            font-size: 2.5rem;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 30px var(--glow-red);
+            cursor: pointer;
+        }
+
+        .action-button-mobile span {
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            margin-left: 5px;
+        }
+
+        /* Show mobile controls only on touch devices */
+        @media (hover: none) and (pointer: coarse) {
+            .joystick-container {
+                display: block;
+            }
+            .action-button-mobile {
+                display: flex;
+            }
         }
 
         /* ===== SETTINGS MODAL ===== */
@@ -596,17 +835,18 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.9);
-            width: 500px;
+            width: 550px;
             max-width: 90%;
-            background: rgba(10, 10, 10, 0.95);
-            border: 1px solid var(--backrooms-yellow);
-            padding: 2rem;
-            z-index: 2000;
+            background: rgba(10, 10, 10, 0.98);
+            border: 3px solid var(--backrooms-yellow);
+            padding: 2.5rem;
+            z-index: 300000;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             font-family: 'VT323', monospace;
+            box-shadow: 0 0 50px rgba(0,0,0,0.9);
         }
 
         .settings-modal.active {
@@ -620,21 +860,21 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
-            border-bottom: 1px solid var(--backrooms-yellow);
+            border-bottom: 2px solid var(--backrooms-yellow);
             padding-bottom: 1rem;
         }
 
         .settings-header h2 {
             color: var(--backrooms-yellow);
-            font-size: 2rem;
-            letter-spacing: 2px;
+            font-size: 2.5rem;
+            letter-spacing: 3px;
         }
 
         .close-settings {
             background: none;
             border: none;
             color: var(--backrooms-yellow);
-            font-size: 2rem;
+            font-size: 2.5rem;
             cursor: pointer;
             transition: color 0.3s ease;
         }
@@ -644,32 +884,34 @@
         }
 
         .settings-group {
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            border-left: 3px solid var(--backrooms-carpet);
+            padding-left: 1.5rem;
         }
 
         .settings-group h3 {
-            color: var(--backrooms-yellow-dark);
+            color: var(--backrooms-yellow-dim);
             margin-bottom: 1rem;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
         }
 
         .setting-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
-            padding: 0.5rem;
+            margin-bottom: 1.2rem;
+            padding: 0.8rem;
             background: rgba(255, 255, 255, 0.05);
-            border-left: 2px solid var(--backrooms-carpet);
+            border: 1px solid rgba(240, 230, 140, 0.2);
         }
 
         /* Toggle Switch */
         .toggle {
             position: relative;
             display: inline-block;
-            width: 60px;
-            height: 30px;
+            width: 70px;
+            height: 34px;
         }
 
         .toggle input {
@@ -685,7 +927,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #333;
+            background-color: #222;
             transition: 0.3s;
             border: 1px solid var(--backrooms-yellow);
         }
@@ -693,8 +935,8 @@
         .toggle-slider:before {
             position: absolute;
             content: "";
-            height: 22px;
-            width: 22px;
+            height: 26px;
+            width: 26px;
             left: 3px;
             bottom: 3px;
             background-color: var(--backrooms-yellow);
@@ -706,43 +948,26 @@
         }
 
         input:checked + .toggle-slider:before {
-            transform: translateX(30px);
+            transform: translateX(35px);
             background-color: #fff;
         }
 
         /* Range Slider */
         .range-slider {
             width: 200px;
-            height: 4px;
-            background: #333;
+            height: 6px;
+            background: #222;
             border: 1px solid var(--backrooms-yellow);
             -webkit-appearance: none;
         }
 
         .range-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
+            width: 20px;
+            height: 20px;
             background: var(--backrooms-yellow);
             cursor: pointer;
             border: 1px solid #fff;
-        }
-
-        /* Difficulty Select */
-        .difficulty-select {
-            background: #000;
-            border: 1px solid var(--backrooms-yellow);
-            color: var(--backrooms-yellow);
-            padding: 0.5rem;
-            font-family: 'VT323', monospace;
-            font-size: 1.2rem;
-            cursor: pointer;
-            width: 150px;
-        }
-
-        .difficulty-select option {
-            background: #000;
-            color: var(--backrooms-yellow);
         }
 
         /* ===== CREDITS MODAL ===== */
@@ -751,16 +976,16 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.9);
-            width: 600px;
+            width: 650px;
             max-width: 90%;
-            background: rgba(10, 10, 10, 0.95);
-            border: 1px solid var(--backrooms-yellow);
-            padding: 2rem;
-            z-index: 2000;
+            background: rgba(10, 10, 10, 0.98);
+            border: 3px solid var(--backrooms-yellow);
+            padding: 2.5rem;
+            z-index: 300000;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             max-height: 80vh;
             overflow-y: auto;
             font-family: 'VT323', monospace;
@@ -777,13 +1002,13 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
-            border-bottom: 1px solid var(--backrooms-yellow);
+            border-bottom: 2px solid var(--backrooms-yellow);
             padding-bottom: 1rem;
         }
 
         .credits-header h2 {
             color: var(--backrooms-yellow);
-            font-size: 2rem;
+            font-size: 2.5rem;
         }
 
         .credits-content {
@@ -792,151 +1017,224 @@
 
         .credit-section {
             margin: 2rem 0;
-            padding: 1rem;
-            border: 1px dashed rgba(240, 230, 140, 0.3);
+            padding: 1.5rem;
+            border: 1px dashed rgba(240, 230, 140, 0.4);
+            background: rgba(0,0,0,0.3);
         }
 
         .credit-section h3 {
             color: var(--backrooms-carpet);
             margin-bottom: 1rem;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
         }
 
         .credit-section p {
             color: var(--backrooms-yellow);
-            margin: 0.5rem 0;
-            font-size: 1.2rem;
+            margin: 0.7rem 0;
+            font-size: 1.3rem;
         }
 
-        /* ===== IN-GAME HUD (for when game starts) ===== */
+        /* ===== IN-GAME HUD ===== */
         .game-hud {
             position: fixed;
-            bottom: 20px;
-            left: 20px;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
             color: var(--backrooms-yellow);
             font-family: 'VT323', monospace;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             z-index: 5000;
             opacity: 0;
             transition: opacity 1s ease;
-            text-shadow: 0 0 5px #000;
+            text-shadow: 0 0 10px #000;
+            width: 90%;
+            max-width: 400px;
+            background: rgba(0,0,0,0.7);
+            padding: 1rem;
+            border: 1px solid var(--backrooms-yellow);
+            backdrop-filter: blur(5px);
         }
 
         .game-hud.visible {
             opacity: 1;
         }
 
-        .sanity-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
+        .sanity-container {
+            margin-bottom: 1rem;
         }
 
-        .sanity-bar {
-            width: 200px;
-            height: 10px;
-            background: #333;
+        .sanity-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .sanity-bar-bg {
+            width: 100%;
+            height: 15px;
+            background: #222;
             border: 1px solid var(--backrooms-yellow);
+            overflow: hidden;
         }
 
         .sanity-fill {
             width: 100%;
             height: 100%;
-            background: var(--backrooms-yellow);
+            background: linear-gradient(90deg, var(--backrooms-yellow), var(--backrooms-carpet));
             transition: width 0.3s ease;
         }
 
         .location-indicator {
-            color: #666;
-            font-size: 0.9rem;
+            text-align: center;
+            color: #aaa;
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
+
+        /* Hide on mobile to avoid clutter with joystick */
+        @media (hover: none) and (pointer: coarse) {
+            .game-hud {
+                bottom: 200px;
+                width: 80%;
+            }
         }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .menu-title {
-                font-size: 3rem;
-                letter-spacing: 5px;
+                font-size: 3.5rem;
+                letter-spacing: 8px;
             }
             
             .intro-line.large {
-                font-size: 2rem;
+                font-size: 2.5rem;
             }
             
             .intro-line {
-                font-size: 1.2rem;
+                font-size: 1.5rem;
             }
             
             .loading-title {
+                font-size: 3rem;
+            }
+            
+            .joystick-container {
+                width: 120px;
+                height: 120px;
+                bottom: 20px;
+                left: 20px;
+            }
+            
+            .joystick-base {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .joystick-thumb {
+                width: 55px;
+                height: 55px;
+            }
+            
+            .action-button-mobile {
+                width: 90px;
+                height: 90px;
+                bottom: 20px;
+                right: 20px;
                 font-size: 2rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- FPS Counter - Real-time performance monitor -->
-    <div class="fps-counter" id="fpsCounter">FPS: <span id="fpsValue">60</span></div>
-
-    <!-- Found Footage Effect Layers -->
-    <div class="found-footage-layer">
-        <div class="static-overlay"></div>
-        <div class="scanlines"></div>
-        <div class="vhs-artifacts"></div>
-        <div class="vignette"></div>
-        <div class="flicker-layer"></div>
-        <div class="vertical-hold"></div>
+    <!-- ===== ULTIMATE FOUND FOOTAGE EFFECT LAYERS ===== -->
+    <div class="effect-layer">
+        <div class="static-heavy" id="staticLayer"></div>
+        <div class="scanlines-heavy"></div>
+        <div class="vhs-distortion"></div>
+        <div class="vignette-heavy"></div>
+        <div class="flicker-heavy" id="flickerLayer"></div>
+        <div class="vertical-roll"></div>
+        <div class="glitch-layer" id="glitchLayer"></div>
     </div>
 
-    <!-- Loading Screen - Authentic VHS Style -->
+    <!-- ===== HUD ELEMENTS ===== -->
+    <div class="fps-counter" id="fpsCounter">FPS: <span id="fpsValue">60</span></div>
+    <div class="tape-counter" id="tapeCounter"><i class="fas fa-tape"></i> TAPE: <span id="tapeTime">23:14</span></div>
+
+    <!-- ===== MOBILE JOYSTICK (ONLY VISIBLE ON TOUCH DEVICES) ===== -->
+    <div class="joystick-container" id="joystickContainer">
+        <div class="joystick-base">
+            <div class="joystick-direction dir-up">▲</div>
+            <div class="joystick-direction dir-down">▼</div>
+            <div class="joystick-direction dir-left">◀</div>
+            <div class="joystick-direction dir-right">▶</div>
+            <div class="joystick-thumb" id="joystickThumb">
+                <i class="fas fa-arrows-alt"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MOBILE ACTION BUTTON ===== -->
+    <div class="action-button-mobile" id="actionButtonMobile">
+        <i class="fas fa-hand-pointer"></i>
+        <span>ACT</span>
+    </div>
+
+    <!-- ===== LOADING SCREEN ===== -->
     <div class="loading-screen" id="loadingScreen">
-        <div class="vhs-tracking"></div>
+        <div class="vhs-preview"></div>
+        <div class="tracking-lines"></div>
         <div class="loading-content">
-            <div class="vhs-label">VHS PLAYBACK // TRACKING...</div>
+            <div class="vhs-badge">VHS • SP-120</div>
             <h1 class="loading-title">BACKROOMS</h1>
-            <div class="loading-subtitle">LIMINAL SPACE ARCHIVE #0001</div>
+            <div class="loading-sub">LIMINAL SPACE ARCHIVE #0001</div>
             
-            <div class="loading-progress-container">
-                <div class="loading-progress" id="loadingProgress"></div>
+            <div class="progress-container">
+                <div class="progress-fill" id="loadingProgress"></div>
             </div>
             
-            <div class="loading-stats">
+            <div class="loading-stats-grid">
                 <span>TIME: <span id="loadingTime">00:00</span></span>
                 <span>DATE: 02/25/2026</span>
-                <span>TAPE: SP-120</span>
+                <span>TRACKING: <span id="trackingStatus">35%</span></span>
             </div>
             
-            <div id="loadingMessage" class="loading-warning">LOADING TAPE...</div>
+            <div class="loading-message" id="loadingMessage">
+                LOADING TAPE...
+            </div>
             
-            <div style="margin-top: 2rem; font-size: 0.8rem; color: #333;">
+            <div class="loading-warning" id="loadingWarning">
                 ⚠️ DO NOT TURN OFF THE DEVICE ⚠️
             </div>
         </div>
     </div>
 
-    <!-- Intro Cinematic - Authentic Found Footage -->
+    <!-- ===== INTRO CINEMATIC ===== -->
     <div class="intro-cinematic" id="introCinematic">
+        <div class="intro-overlay"></div>
         <div class="intro-timestamp" id="introTimestamp">02:47:23</div>
-        <div class="intro-counter" id="introCounter">TAPE REMAINING: 23:14</div>
+        <div class="intro-tape-counter" id="introTapeCounter">TAPE REMAINING: 23:14</div>
         
         <div class="intro-text-container" id="introText">
-            <div class="intro-line" id="introLine1">[STATIC]</div>
-            <div class="intro-line" id="introLine2">I SHOULDN'T HAVE CLIPPED THROUGH...</div>
-            <div class="intro-line large" id="introLine3">BACKROOMS</div>
-            <div class="intro-line" id="introLine4">LEVEL 0 - THE OFFICE</div>
-            <div class="intro-line small" id="introLine5">6 BILLION SQUARE MILES OF YELLOW</div>
-            <div class="intro-line small" id="introLine6">THE HUM NEVER STOPS...</div>
-            <div class="intro-line glitch" id="introLine7">THEY ARE WATCHING</div>
+            <div class="intro-line" id="introLine1">[STATIC INTERFERENCE]</div>
+            <div class="intro-line" id="introLine2">I SHOULDN'T HAVE CLIPPED THROUGH REALITY...</div>
+            <div class="intro-line large" id="introLine3">THE BACKROOMS</div>
+            <div class="intro-line" id="introLine4">LEVEL 0 - THE INFINITE OFFICE</div>
+            <div class="intro-line small" id="introLine5">6 BILLION SQUARE MILES OF YELLOW WALLPAPER</div>
+            <div class="intro-line small" id="introLine6">THE HUM NEVER STOPS... IT GETS LOUDER</div>
+            <div class="intro-line" id="introLine7">THERE IS NO ESCAPE</div>
+            <div class="intro-line glitch" id="introLine8">THEY ARE WATCHING FROM THE CORNERS</div>
         </div>
     </div>
 
-    <!-- Three.js Canvas Container -->
+    <!-- ===== THREE.JS CANVAS ===== -->
     <div id="canvas-container"></div>
 
-    <!-- Main Menu -->
+    <!-- ===== MAIN MENU ===== -->
     <div class="menu-container" id="menuContainer">
         <div class="menu-content">
             <h1 class="menu-title">BACKROOMS</h1>
-            <p class="menu-subtitle">LEVEL 0 // NO CLIP ZONE</p>
+            <p class="menu-level">LEVEL 0 // NO-CLIP ZONE</p>
             
             <div class="menu-buttons">
                 <button class="menu-btn primary" id="startGameBtn">
@@ -954,16 +1252,16 @@
             </div>
             
             <div class="menu-warning">
-                ⚠️ PROLONGED EXPOSURE MAY CAUSE SANITY LOSS ⚠️
+                ⚠️ PROLONGED EXPOSURE MAY CAUSE REALITY DETACHMENT ⚠️
             </div>
         </div>
         
         <div class="menu-footer">
-            <p>© 2026 BACKROOMS ARCHIVE | FOUND FOOTAGE SIMULATION</p>
+            <p>© 2026 BACKROOMS ARCHIVE | FOUND FOOTAGE SIMULATION v1.0</p>
         </div>
     </div>
 
-    <!-- Settings Modal -->
+    <!-- ===== SETTINGS MODAL ===== -->
     <div class="settings-modal" id="settingsModal">
         <div class="settings-header">
             <h2><i class="fas fa-cog"></i> VHS SETTINGS</h2>
@@ -971,7 +1269,7 @@
         </div>
         
         <div class="settings-group">
-            <h3>AUDIO</h3>
+            <h3>🎵 AUDIO</h3>
             <div class="setting-item">
                 <span><i class="fas fa-volume-up"></i> THE HUM</span>
                 <label class="toggle">
@@ -980,7 +1278,7 @@
                 </label>
             </div>
             <div class="setting-item">
-                <span><i class="fas fa-music"></i> AMBIENT STATIC</span>
+                <span><i class="fas fa-wave-square"></i> STATIC NOISE</span>
                 <label class="toggle">
                     <input type="checkbox" id="musicToggle" checked>
                     <span class="toggle-slider"></span>
@@ -993,16 +1291,13 @@
         </div>
         
         <div class="settings-group">
-            <h3>VHS EFFECTS</h3>
+            <h3>📺 VISUAL EFFECTS</h3>
             <div class="setting-item">
-                <span><i class="fas fa-film"></i> STATIC NOISE</span>
-                <label class="toggle">
-                    <input type="checkbox" id="staticToggle" checked>
-                    <span class="toggle-slider"></span>
-                </label>
+                <span><i class="fas fa-cloud"></i> STATIC INTENSITY</span>
+                <input type="range" min="0" max="100" value="70" class="range-slider" id="staticSlider">
             </div>
             <div class="setting-item">
-                <span><i class="fas fa-sun"></i> FLICKER INTENSITY</span>
+                <span><i class="fas fa-bolt"></i> FLICKER RATE</span>
                 <input type="range" min="0" max="100" value="70" class="range-slider" id="flickerSlider">
             </div>
             <div class="setting-item">
@@ -1015,20 +1310,20 @@
         </div>
         
         <div class="settings-group">
-            <h3>DIFFICULTY</h3>
+            <h3>⚔️ DIFFICULTY</h3>
             <div class="setting-item">
                 <span><i class="fas fa-skull"></i> BACKROOMS LEVEL</span>
                 <select class="difficulty-select" id="difficultySelect">
-                    <option value="easy">LEVEL 0 - SAFE</option>
-                    <option value="normal" selected>LEVEL 1 - HABITABLE</option>
-                    <option value="hard">LEVEL 2 - PIPE DREAMS</option>
-                    <option value="nightmare">LEVEL 3 - ELECTRICAL STATION</option>
+                    <option value="level0">LEVEL 0 - THE OFFICE</option>
+                    <option value="level1" selected>LEVEL 1 - HABITABLE ZONE</option>
+                    <option value="level2">LEVEL 2 - PIPE DREAMS</option>
+                    <option value="level3">LEVEL 3 - ELECTRICAL STATION</option>
                 </select>
             </div>
         </div>
     </div>
 
-    <!-- Credits Modal -->
+    <!-- ===== CREDITS MODAL ===== -->
     <div class="credits-modal" id="creditsModal">
         <div class="credits-header">
             <h2><i class="fas fa-scroll"></i> ARCHIVE CREDITS</h2>
@@ -1037,53 +1332,60 @@
         
         <div class="credits-content">
             <div class="credit-section">
-                <h3>FOUND FOOTAGE BY</h3>
+                <h3>📼 FOUND FOOTAGE BY</h3>
                 <p>BRENNINHO123</p>
                 <p>LOST IN THE BACKROOMS • 2026</p>
             </div>
             
             <div class="credit-section">
-                <h3>THE BACKROOMS LORE</h3>
-                <p>ORIGINAL CONCEPT BY 4CHAN</p>
+                <h3>🌌 THE BACKROOMS LORE</h3>
+                <p>ORIGINAL CONCEPT BY 4CHAN (2019)</p>
                 <p>EXPANDED BY KANE PIXELS</p>
                 <p>THE LIMINAL SPACE COMMUNITY</p>
             </div>
             
             <div class="credit-section">
-                <h3>THOSE WHO DIDN'T MAKE IT</h3>
+                <h3>💀 THOSE WHO DIDN'T MAKE IT</h3>
                 <p>In memory of everyone who noclipped</p>
                 <p>and never found their way back...</p>
+                <p style="margin-top: 1rem; color: var(--backrooms-carpet);">YOU WILL BE FOUND</p>
             </div>
             
             <div class="credit-section">
-                <h3>TECHNICAL</h3>
+                <h3>⚙️ TECHNICAL</h3>
                 <p>THREE.JS - 3D RENDERING</p>
                 <p>GSAP - VHS ANIMATIONS</p>
+                <p>HAMMER.JS - TOUCH CONTROLS</p>
                 <p>FOUND FOOTAGE EFFECTS</p>
             </div>
             
             <div class="credit-section">
-                <h3>WARNING</h3>
+                <h3>⚠️ WARNING</h3>
                 <p>IF YOU'RE WATCHING THIS TAPE</p>
                 <p>IT'S ALREADY TOO LATE</p>
                 <p>WELCOME TO THE BACKROOMS</p>
-                <p style="color: var(--backrooms-carpet); margin-top: 1rem;">THERE IS NO ESCAPE</p>
+                <p style="color: var(--backrooms-carpet); font-size: 2rem; margin-top: 1rem;">NO ESCAPE</p>
             </div>
         </div>
     </div>
 
-    <!-- In-Game HUD (hidden until game starts) -->
+    <!-- ===== IN-GAME HUD ===== -->
     <div class="game-hud" id="gameHud">
-        <div class="sanity-indicator">
-            <span>SANITY:</span>
-            <div class="sanity-bar">
+        <div class="sanity-container">
+            <div class="sanity-label">
+                <span><i class="fas fa-brain"></i> SANITY</span>
+                <span id="sanityPercentage">100%</span>
+            </div>
+            <div class="sanity-bar-bg">
                 <div class="sanity-fill" id="sanityFill" style="width: 100%;"></div>
             </div>
         </div>
-        <div class="location-indicator" id="locationIndicator">LEVEL 0 // COORDINATES: ???</div>
+        <div class="location-indicator" id="locationIndicator">
+            <i class="fas fa-map-pin"></i> LEVEL 0 // COORDINATES: ???
+        </div>
     </div>
 
-    <!-- Audio Elements -->
+    <!-- ===== AUDIO ELEMENTS ===== -->
     <audio id="theHum" loop preload="auto">
         <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
     </audio>
@@ -1091,9 +1393,13 @@
     <audio id="staticAudio" loop preload="auto">
         <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
     </audio>
+    
+    <audio id="footstepAudio" preload="auto">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
-        // ===== FPS COUNTER =====
+        // ===== FPS COUNTER CLASS =====
         class FPSCounter {
             constructor() {
                 this.fps = 60;
@@ -1129,6 +1435,86 @@
             }
         }
 
+        // ===== MOBILE JOYSTICK CONTROLLER =====
+        class MobileJoystick {
+            constructor() {
+                this.container = document.getElementById('joystickContainer');
+                this.thumb = document.getElementById('joystickThumb');
+                this.active = false;
+                this.angle = 0;
+                this.force = 0;
+                this.direction = { x: 0, y: 0 };
+                
+                if (this.container && this.thumb) {
+                    this.init();
+                }
+            }
+
+            init() {
+                const hammer = new Hammer.Manager(this.container);
+                const pan = new Hammer.Pan({ direction: Hammer.DIRECTION_ALL, threshold: 5 });
+                hammer.add(pan);
+                
+                hammer.on('panstart', (e) => this.onStart(e));
+                hammer.on('panmove', (e) => this.onMove(e));
+                hammer.on('panend', (e) => this.onEnd(e));
+                hammer.on('pancancel', (e) => this.onEnd(e));
+            }
+
+            onStart(e) {
+                this.active = true;
+                this.thumb.style.transform = 'scale(1.1)';
+            }
+
+            onMove(e) {
+                if (!this.active) return;
+                
+                const rect = this.container.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                let deltaX = e.center.x - centerX;
+                let deltaY = e.center.y - centerY;
+                
+                // Limit to joystick radius
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                const maxDistance = rect.width / 2 - 10;
+                
+                if (distance > maxDistance) {
+                    deltaX = (deltaX / distance) * maxDistance;
+                    deltaY = (deltaY / distance) * maxDistance;
+                }
+                
+                // Move thumb
+                this.thumb.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(1.1)`;
+                
+                // Calculate direction and force
+                this.force = Math.min(distance / maxDistance, 1);
+                this.angle = Math.atan2(deltaY, deltaX);
+                
+                this.direction = {
+                    x: deltaX / maxDistance,
+                    y: deltaY / maxDistance
+                };
+                
+                // Trigger movement in game
+                if (window.game) {
+                    window.game.handleJoystickMove(this.direction);
+                }
+            }
+
+            onEnd(e) {
+                this.active = false;
+                this.thumb.style.transform = 'translate(0px, 0px) scale(1)';
+                this.direction = { x: 0, y: 0 };
+                this.force = 0;
+                
+                if (window.game) {
+                    window.game.handleJoystickEnd();
+                }
+            }
+        }
+
         // ===== BACKROOMS GAME CLASS =====
         class BackroomsGame {
             constructor() {
@@ -1137,6 +1523,13 @@
                 this.renderer = null;
                 this.startTime = Date.now();
                 this.fpsCounter = new FPSCounter();
+                this.mobileJoystick = null;
+                this.playerPosition = { x: 0, y: 0, z: 0 };
+                this.playerRotation = 0;
+                this.sanity = 100;
+                this.tapeTime = 23 * 60 + 14; // 23:14
+                this.moveSpeed = 0.05;
+                
                 this.initialize();
             }
 
@@ -1144,17 +1537,28 @@
                 this.initThree();
                 this.initLoading();
                 this.initEventListeners();
+                this.initMobileControls();
                 this.startLoadingSequence();
+                
+                // Start tape countdown
+                setInterval(() => {
+                    this.tapeTime--;
+                    if (this.tapeTime < 0) this.tapeTime = 0;
+                    const minutes = Math.floor(this.tapeTime / 60);
+                    const seconds = this.tapeTime % 60;
+                    document.getElementById('tapeTime').textContent = 
+                        `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }, 1000);
             }
 
             initThree() {
                 // Three.js Scene - Authentic Backrooms atmosphere
                 this.scene = new THREE.Scene();
                 this.scene.background = new THREE.Color(0x1a150e);
-                this.scene.fog = new THREE.FogExp2(0x1a150e, 0.02);
+                this.scene.fog = new THREE.FogExp2(0x1a150e, 0.015);
                 
                 // Camera
-                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
                 this.camera.position.set(0, 1.6, 5);
                 
                 // Renderer
@@ -1167,93 +1571,180 @@
                 const ambientLight = new THREE.AmbientLight(0x404030);
                 this.scene.add(ambientLight);
                 
-                const directionalLight = new THREE.DirectionalLight(0xfff0c0, 0.5);
-                directionalLight.position.set(1, 2, 1);
-                this.scene.add(directionalLight);
-                
                 // Create authentic Backrooms environment
-                this.createBackroomsScene();
+                this.createBackroomsWorld();
                 
                 // Start animation
                 this.animate();
             }
 
-            createBackroomsScene() {
-                // Yellow walls
+            createBackroomsWorld() {
+                // Materials
                 const wallMaterial = new THREE.MeshStandardMaterial({ 
                     color: 0xe8d9b5,
                     emissive: 0x221c10,
-                    roughness: 0.7,
-                    metalness: 0.1
+                    roughness: 0.8,
+                    metalness: 0.05
                 });
                 
-                // Carpet floor (red)
                 const floorMaterial = new THREE.MeshStandardMaterial({ 
-                    color: 0xc41e3a,
+                    color: 0x8b1e3f,
                     roughness: 0.9,
-                    emissive: 0x220000
+                    emissive: 0x2a0a15
+                });
+
+                const trimMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xc9b37e,
+                    roughness: 0.6
                 });
 
                 // Create infinite grid of offices
-                for (let x = -5; x <= 5; x++) {
-                    for (let z = -5; z <= 5; z++) {
-                        // Floor tiles
+                for (let x = -8; x <= 8; x++) {
+                    for (let z = -8; z <= 8; z++) {
+                        // Floor tiles with carpet pattern
                         const floorTile = new THREE.Mesh(
-                            new THREE.BoxGeometry(0.9, 0.1, 0.9),
+                            new THREE.BoxGeometry(0.98, 0.1, 0.98),
                             floorMaterial
                         );
-                        floorTile.position.set(x * 1.5, -0.05, z * 1.5);
+                        floorTile.position.set(x * 2, -0.05, z * 2);
                         this.scene.add(floorTile);
                         
-                        // Walls (only at edges)
-                        if (Math.random() > 0.7) {
+                        // Add carpet texture lines
+                        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x5a1429 });
+                        for (let i = -0.4; i <= 0.4; i+=0.8) {
+                            const points = [];
+                            points.push(new THREE.Vector3(x * 2 + i, 0, z * 2 - 0.9));
+                            points.push(new THREE.Vector3(x * 2 + i, 0, z * 2 + 0.9));
+                            const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+                            const line = new THREE.Line(lineGeometry, lineMaterial);
+                            this.scene.add(line);
+                        }
+                        
+                        // Walls with random placement
+                        if (Math.random() > 0.6) {
                             const wall = new THREE.Mesh(
-                                new THREE.BoxGeometry(0.2, 2, 1.5),
+                                new THREE.BoxGeometry(2, 2.5, 0.2),
                                 wallMaterial
                             );
-                            wall.position.set(x * 1.5, 1, z * 1.5 + 0.8);
+                            wall.position.set(x * 2 + (Math.random() - 0.5), 1.25, z * 2 + 1);
                             this.scene.add(wall);
                         }
                         
-                        // Fluorescent lights (yellow glow)
-                        if (Math.random() > 0.8) {
-                            const light = new THREE.PointLight(0xfff0c0, 0.5, 3);
-                            light.position.set(x * 1.5, 2, z * 1.5);
+                        // Fluorescent lights
+                        if (Math.random() > 0.7) {
+                            const light = new THREE.PointLight(0xfff0c0, 0.8, 4);
+                            light.position.set(x * 2, 2.2, z * 2);
                             this.scene.add(light);
                             
                             // Light fixture
                             const fixture = new THREE.Mesh(
-                                new THREE.BoxGeometry(0.3, 0.1, 0.6),
+                                new THREE.BoxGeometry(0.4, 0.1, 1.2),
                                 new THREE.MeshStandardMaterial({ color: 0xcccccc, emissive: 0x332200 })
                             );
-                            fixture.position.set(x * 1.5, 1.9, z * 1.5);
+                            fixture.position.set(x * 2, 2.1, z * 2);
                             this.scene.add(fixture);
+                        }
+                        
+                        // Random office furniture
+                        if (Math.random() > 0.8) {
+                            // Desk
+                            const desk = new THREE.Mesh(
+                                new THREE.BoxGeometry(1, 0.8, 0.6),
+                                new THREE.MeshStandardMaterial({ color: 0x8b5a2b })
+                            );
+                            desk.position.set(x * 2 + 0.5, 0.4, z * 2 + 0.3);
+                            this.scene.add(desk);
                         }
                     }
                 }
                 
                 // Add floating particles (dust)
                 const particleGeometry = new THREE.BufferGeometry();
-                const particleCount = 500;
+                const particleCount = 1000;
                 const positions = new Float32Array(particleCount * 3);
+                const colors = new Float32Array(particleCount * 3);
                 
                 for (let i = 0; i < particleCount * 3; i += 3) {
-                    positions[i] = (Math.random() - 0.5) * 20;
-                    positions[i+1] = (Math.random() - 0.5) * 5;
-                    positions[i+2] = (Math.random() - 0.5) * 20;
+                    positions[i] = (Math.random() - 0.5) * 40;
+                    positions[i+1] = (Math.random() - 0.5) * 8;
+                    positions[i+2] = (Math.random() - 0.5) * 40;
+                    
+                    // Yellowish dust
+                    colors[i] = 1.0;
+                    colors[i+1] = 0.9;
+                    colors[i+2] = 0.5;
                 }
                 
                 particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
                 
                 const particleMaterial = new THREE.PointsMaterial({
-                    color: 0xfff0c0,
-                    size: 0.02,
+                    size: 0.03,
+                    vertexColors: true,
                     transparent: true,
-                    opacity: 0.3
+                    opacity: 0.3,
+                    blending: THREE.AdditiveBlending
                 });
                 
                 const particles = new THREE.Points(particleGeometry, particleMaterial);
                 this.scene.add(particles);
+                this.particles = particles;
+            }
+
+            initMobileControls() {
+                // Only initialize if touch device
+                if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
+                    this.mobileJoystick = new MobileJoystick();
+                    
+                    // Action button
+                    document.getElementById('actionButtonMobile').addEventListener('click', () => {
+                        this.interact();
+                    });
+                }
+            }
+
+            handleJoystickMove(direction) {
+                // Move player based on joystick direction
+                if (this.camera) {
+                    // Forward/backward movement
+                    this.camera.position.x += direction.x * this.moveSpeed;
+                    this.camera.position.z += direction.y * this.moveSpeed;
+                    
+                    // Update player position
+                    this.playerPosition.x = this.camera.position.x;
+                    this.playerPosition.z = this.camera.position.z;
+                    
+                    // Add head bobbing effect
+                    this.camera.position.y = 1.6 + Math.sin(Date.now() * 0.01) * 0.03;
+                    
+                    // Play footstep sound occasionally
+                    if (Math.random() > 0.99) {
+                        const footstep = document.getElementById('footstepAudio');
+                        footstep.volume = 0.2;
+                        footstep.play();
+                    }
+                }
+            }
+
+            handleJoystickEnd() {
+                // Reset head position
+                if (this.camera) {
+                    this.camera.position.y = 1.6;
+                }
+            }
+
+            interact() {
+                console.log('Interacting');
+                // Visual feedback
+                const btn = document.getElementById('actionButtonMobile');
+                btn.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    btn.style.transform = 'scale(1)';
+                }, 100);
+                
+                // Random sanity effect
+                this.sanity = Math.max(0, this.sanity - 2);
+                this.updateSanity();
             }
 
             initLoading() {
@@ -1261,17 +1752,19 @@
                 this.loadingProgress = document.getElementById('loadingProgress');
                 this.loadingMessage = document.getElementById('loadingMessage');
                 this.loadingTime = document.getElementById('loadingTime');
+                this.trackingStatus = document.getElementById('trackingStatus');
                 
                 const loadingMessages = [
-                    'LOADING TAPE...',
+                    'LOADING VHS TAPE...',
                     'TRACKING SIGNAL...',
                     'STABILIZING STATIC...',
                     'ACCESSING BACKROOMS ARCHIVE...',
                     'WARNING: REALITY GLITCH DETECTED...',
                     'PREPARING LIMINAL SPACE...',
                     'THE HUM IS GETTING LOUDER...',
+                    'SOMETHING IS MOVING IN THE CORNERS...',
                     'DO NOT LOOK BEHIND YOU...',
-                    'LOADING COMPLETE...'
+                    'LOADING COMPLETE... WELCOME TO THE BACKROOMS'
                 ];
                 
                 this.loadingMessages = loadingMessages;
@@ -1282,7 +1775,7 @@
                 let messageIndex = 0;
                 
                 const interval = setInterval(() => {
-                    progress += Math.random() * 2 + 0.5;
+                    progress += Math.random() * 1.5 + 0.8;
                     
                     if (progress >= 100) {
                         progress = 100;
@@ -1293,8 +1786,8 @@
                             setTimeout(() => {
                                 this.loadingScreen.style.display = 'none';
                                 this.startIntro();
-                            }, 1000);
-                        }, 500);
+                            }, 2000);
+                        }, 1000);
                     }
                     
                     this.loadingProgress.style.width = progress + '%';
@@ -1305,6 +1798,9 @@
                         messageIndex = this.loadingMessages.length - 1;
                     }
                     this.loadingMessage.textContent = this.loadingMessages[messageIndex];
+                    
+                    // Update tracking status
+                    this.trackingStatus.textContent = Math.floor(30 + progress * 0.7) + '%';
                     
                     // Update time
                     const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
@@ -1318,21 +1814,18 @@
                 const intro = document.getElementById('introCinematic');
                 intro.style.display = 'block';
                 
-                // Update timestamp in real-time
+                // Update timestamp
                 setInterval(() => {
                     const date = new Date();
                     document.getElementById('introTimestamp').textContent = 
                         `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
                 }, 1000);
                 
-                // Counter countdown
-                let tapeRemaining = 23 * 60 + 14; // 23:14
+                // Update tape counter
                 setInterval(() => {
-                    tapeRemaining--;
-                    if (tapeRemaining < 0) tapeRemaining = 0;
-                    const minutes = Math.floor(tapeRemaining / 60);
-                    const seconds = tapeRemaining % 60;
-                    document.getElementById('introCounter').textContent = 
+                    const minutes = Math.floor(this.tapeTime / 60);
+                    const seconds = this.tapeTime % 60;
+                    document.getElementById('introTapeCounter').textContent = 
                         `TAPE REMAINING: ${minutes}:${seconds.toString().padStart(2, '0')}`;
                 }, 1000);
                 
@@ -1344,61 +1837,54 @@
                     document.getElementById('introLine4'),
                     document.getElementById('introLine5'),
                     document.getElementById('introLine6'),
-                    document.getElementById('introLine7')
+                    document.getElementById('introLine7'),
+                    document.getElementById('introLine8')
                 ];
                 
                 lines.forEach(line => {
                     if (line) {
                         line.style.opacity = '0';
-                        line.style.transform = 'translateY(20px)';
+                        line.style.transform = 'translateY(30px)';
                     }
                 });
                 
-                // Animate lines with authentic timing
-                setTimeout(() => {
-                    if (lines[0]) gsap.to(lines[0], { opacity: 1, y: 0, duration: 1 });
-                    
+                // Animate with authentic horror timing
+                const delays = [500, 2500, 4500, 6500, 8500, 10500, 12500, 14500];
+                
+                lines.forEach((line, index) => {
                     setTimeout(() => {
-                        if (lines[0]) gsap.to(lines[0], { opacity: 0, duration: 0.5 });
-                        if (lines[1]) gsap.to(lines[1], { opacity: 1, y: 0, duration: 1.5 });
-                        
-                        setTimeout(() => {
-                            if (lines[1]) gsap.to(lines[1], { opacity: 0, duration: 0.5 });
-                            if (lines[2]) gsap.to(lines[2], { opacity: 1, y: 0, duration: 2 });
+                        if (line) {
+                            gsap.to(line, {
+                                opacity: 1,
+                                y: 0,
+                                duration: 2,
+                                ease: "power2.out"
+                            });
                             
-                            setTimeout(() => {
-                                if (lines[2]) gsap.to(lines[2], { opacity: 0, duration: 0.5 });
-                                if (lines[3]) gsap.to(lines[3], { opacity: 1, y: 0, duration: 1.5 });
-                                
-                                setTimeout(() => {
-                                    if (lines[3]) gsap.to(lines[3], { opacity: 0, duration: 0.5 });
-                                    if (lines[4]) gsap.to(lines[4], { opacity: 1, y: 0, duration: 1.5 });
-                                    
-                                    setTimeout(() => {
-                                        if (lines[4]) gsap.to(lines[4], { opacity: 0, duration: 0.5 });
-                                        if (lines[5]) gsap.to(lines[5], { opacity: 1, y: 0, duration: 1.5 });
-                                        
-                                        setTimeout(() => {
-                                            if (lines[5]) gsap.to(lines[5], { opacity: 0, duration: 0.5 });
-                                            if (lines[6]) {
-                                                gsap.to(lines[6], { opacity: 1, y: 0, duration: 2 });
-                                                
-                                                setTimeout(() => {
-                                                    gsap.to(intro, { opacity: 0, duration: 3 });
-                                                    
-                                                    setTimeout(() => {
-                                                        intro.style.display = 'none';
-                                                        this.showMainMenu();
-                                                    }, 3000);
-                                                }, 3000);
-                                            }
-                                        }, 3000);
-                                    }, 3000);
-                                }, 3000);
-                            }, 3000);
-                        }, 3000);
-                    }, 2000);
-                }, 1000);
+                            // Hide previous line
+                            if (index > 0) {
+                                gsap.to(lines[index - 1], {
+                                    opacity: 0,
+                                    y: -20,
+                                    duration: 1,
+                                    delay: 0.5
+                                });
+                            }
+                        }
+                    }, delays[index]);
+                });
+                
+                // End intro
+                setTimeout(() => {
+                    gsap.to(intro, {
+                        opacity: 0,
+                        duration: 4,
+                        onComplete: () => {
+                            intro.style.display = 'none';
+                            this.showMainMenu();
+                        }
+                    });
+                }, 17000);
             }
 
             showMainMenu() {
@@ -1409,6 +1895,11 @@
                 const theHum = document.getElementById('theHum');
                 theHum.volume = 0.3;
                 theHum.play().catch(e => console.log('Audio autoplay blocked'));
+                
+                // Start static
+                const staticAudio = document.getElementById('staticAudio');
+                staticAudio.volume = 0.2;
+                staticAudio.play().catch(e => console.log('Static autoplay blocked'));
             }
 
             initEventListeners() {
@@ -1459,32 +1950,63 @@
                     theHum.volume = e.target.value / 100;
                 });
                 
-                // Effect toggles
-                document.getElementById('staticToggle').addEventListener('change', (e) => {
-                    document.querySelector('.static-overlay').style.opacity = e.target.checked ? '0.15' : '0';
-                });
-                
-                document.getElementById('vignetteToggle').addEventListener('change', (e) => {
-                    document.querySelector('.vignette').style.opacity = e.target.checked ? '1' : '0';
+                // Effect controls
+                document.getElementById('staticSlider').addEventListener('input', (e) => {
+                    document.getElementById('staticLayer').style.opacity = e.target.value / 100 * 0.3;
                 });
                 
                 document.getElementById('flickerSlider').addEventListener('input', (e) => {
-                    document.querySelector('.flicker-layer').style.opacity = e.target.value / 100 * 0.1;
+                    document.getElementById('flickerLayer').style.animation = 
+                        `flickerBackrooms ${0.5 - (e.target.value / 200)}s infinite`;
                 });
                 
-                // Close modals with Escape
+                document.getElementById('vignetteToggle').addEventListener('change', (e) => {
+                    document.querySelector('.vignette-heavy').style.opacity = e.target.checked ? '0.9' : '0';
+                });
+                
+                // Keyboard controls for desktop
                 document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') {
-                        document.getElementById('settingsModal').classList.remove('active');
-                        document.getElementById('creditsModal').classList.remove('active');
+                    if (!this.gameActive) return;
+                    
+                    switch(e.key) {
+                        case 'w':
+                        case 'W':
+                        case 'ArrowUp':
+                            this.camera.position.z -= this.moveSpeed;
+                            break;
+                        case 's':
+                        case 'S':
+                        case 'ArrowDown':
+                            this.camera.position.z += this.moveSpeed;
+                            break;
+                        case 'a':
+                        case 'A':
+                        case 'ArrowLeft':
+                            this.camera.position.x -= this.moveSpeed;
+                            break;
+                        case 'd':
+                        case 'D':
+                        case 'ArrowRight':
+                            this.camera.position.x += this.moveSpeed;
+                            break;
+                        case 'e':
+                        case 'E':
+                            this.interact();
+                            break;
+                        case 'Escape':
+                            document.getElementById('settingsModal').classList.remove('active');
+                            document.getElementById('creditsModal').classList.remove('active');
+                            break;
                     }
                 });
                 
                 // Window resize
                 window.addEventListener('resize', () => {
-                    this.camera.aspect = window.innerWidth / window.innerHeight;
-                    this.camera.updateProjectionMatrix();
-                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                    if (this.camera && this.renderer) {
+                        this.camera.aspect = window.innerWidth / window.innerHeight;
+                        this.camera.updateProjectionMatrix();
+                        this.renderer.setSize(window.innerWidth, window.innerHeight);
+                    }
                 });
             }
 
@@ -1496,58 +2018,91 @@
                 const gameHud = document.getElementById('gameHud');
                 gameHud.classList.add('visible');
                 
-                // Start decreasing sanity
-                let sanity = 100;
+                this.gameActive = true;
+                
+                // Start sanity drain
                 setInterval(() => {
-                    sanity -= 0.1;
-                    if (sanity < 0) sanity = 0;
-                    document.getElementById('sanityFill').style.width = sanity + '%';
+                    if (!this.gameActive) return;
                     
-                    // Random location updates
+                    this.sanity = Math.max(0, this.sanity - 0.1);
+                    this.updateSanity();
+                    
+                    // Random location names
                     const locations = [
-                        'LEVEL 0 // THE OFFICE',
-                        'THE ENDLESS YELLOW',
+                        'THE INFINITE OFFICE',
+                        'YELLOW WALLPAPER SECTOR',
+                        'NEAR THE FLICKERING LIGHTS',
+                        'ABANDONED DESK AREA',
+                        'THE HUMMING CORRIDOR',
                         'COORDINATES: ???',
-                        'NEAR THE HUM',
-                        'FLUORESCENT SECTOR',
-                        'ABANDONED ZONE',
+                        'ENTITY PROXIMITY UNKNOWN',
                         'THE NO-CLIP ZONE'
                     ];
-                    document.getElementById('locationIndicator').textContent = 
-                        locations[Math.floor(Math.random() * locations.length)];
                     
-                    if (sanity <= 0) {
-                        alert('YOU LOST YOUR SANITY... GAME OVER');
-                        location.reload();
+                    document.getElementById('locationIndicator').innerHTML = 
+                        `<i class="fas fa-map-pin"></i> LEVEL 0 // ${locations[Math.floor(Math.random() * locations.length)]}`;
+                    
+                    if (this.sanity <= 0) {
+                        this.gameOver();
                     }
                 }, 1000);
                 
-                // Move camera slightly for immersion
-                let time = 0;
+                // Random entity sounds
                 setInterval(() => {
-                    time += 0.1;
-                    if (this.camera) {
-                        this.camera.position.x = Math.sin(time) * 0.5;
-                        this.camera.position.y = 1.6 + Math.sin(time * 2) * 0.05;
+                    if (Math.random() > 0.7 && this.gameActive) {
+                        this.sanity -= 5;
+                        this.updateSanity();
+                        
+                        // Show glitch
+                        document.getElementById('glitchLayer').style.opacity = '0.5';
+                        setTimeout(() => {
+                            document.getElementById('glitchLayer').style.opacity = '0.2';
+                        }, 200);
                     }
-                }, 50);
+                }, 5000);
+            }
+
+            updateSanity() {
+                const sanityFill = document.getElementById('sanityFill');
+                const sanityPercent = document.getElementById('sanityPercentage');
+                
+                sanityFill.style.width = this.sanity + '%';
+                sanityPercent.textContent = Math.floor(this.sanity) + '%';
+                
+                // Change color based on sanity
+                if (this.sanity < 30) {
+                    sanityFill.style.background = 'linear-gradient(90deg, #8b1e3f, #4a0f20)';
+                } else if (this.sanity < 60) {
+                    sanityFill.style.background = 'linear-gradient(90deg, #f0e68c, #c9b37e)';
+                }
+            }
+
+            gameOver() {
+                this.gameActive = false;
+                alert('⚠️ YOUR SANITY HAS CRUMBLED... ⚠️\n\nYOU HAVE BECOME PART OF THE BACKROOMS FOREVER');
+                location.reload();
             }
 
             animate() {
                 requestAnimationFrame(() => this.animate());
                 
-                // Rotate scene slightly for liminal feeling
-                if (this.scene) {
-                    this.scene.rotation.y += 0.0005;
+                // Animate particles
+                if (this.particles) {
+                    this.particles.rotation.y += 0.0001;
+                }
+                
+                // Camera sway
+                if (this.gameActive && this.camera) {
+                    this.camera.rotation.y += Math.sin(Date.now() * 0.001) * 0.001;
                 }
                 
                 this.renderer.render(this.scene, this.camera);
             }
         }
 
-        // Start the game when DOM is ready
+        // Initialize game
         document.addEventListener('DOMContentLoaded', () => {
-            window.game = new BackroomsGame();
+            window.game = new BackroomsGames();
         });
     </script>
 </body>
