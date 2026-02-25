@@ -1,340 +1,1094 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BACKROOMS - Nível 0: Os Escritórios Infinitos</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@300;400;700&family=VT323&display=swap" rel="stylesheet">
+    <title>BACKROOMS: LIMINAL EXPERIENCE</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Major+Mono+Display&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Three.js for 3D effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    
+    <style>
+        /* Root Variables */
+        :root {
+            --primary: #ffd966;
+            --primary-dark: #b8860b;
+            --secondary: #2a2a2a;
+            --accent: #dc3545;
+            --bg-dark: #0a0a0a;
+            --bg-darker: #050505;
+            --text-light: #e0e0e0;
+            --text-dim: #808080;
+            --glow: rgba(255, 217, 102, 0.3);
+            --scanline: rgba(0, 255, 0, 0.03);
+        }
+
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-darker);
+            color: var(--text-light);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-logo {
+            font-family: 'Major Mono Display', monospace;
+            font-size: 4rem;
+            color: var(--primary);
+            text-shadow: 0 0 20px var(--glow);
+            margin-bottom: 2rem;
+            animation: pulseGlow 2s infinite;
+        }
+
+        .loading-bar-container {
+            width: 400px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 2rem auto;
+        }
+
+        .loading-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), white);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        .loading-text {
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+        }
+
+        /* Intro Cinematic */
+        .intro-cinematic {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 9000;
+            display: none;
+            perspective: 1000px;
+        }
+
+        .intro-vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, black 80%);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .intro-scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                var(--scanline) 0px,
+                var(--scanline) 2px,
+                transparent 2px,
+                transparent 4px
+            );
+            pointer-events: none;
+            z-index: 11;
+            opacity: 0.3;
+        }
+
+        .intro-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.3;
+        }
+
+        .intro-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 20;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .intro-line {
+            font-family: 'VT323', monospace;
+            font-size: 2rem;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--glow);
+            margin: 1rem 0;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .intro-line.large {
+            font-size: 4rem;
+            font-family: 'Major Mono Display', monospace;
+        }
+
+        .intro-line.small {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+        }
+
+        /* Three.js Canvas */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Main Menu */
+        .menu-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 2s ease;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+        }
+
+        .menu-container.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .menu-content {
+            text-align: center;
+            transform: translateY(30px);
+            opacity: 0;
+            transition: all 1s ease 0.5s;
+        }
+
+        .menu-container.visible .menu-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .menu-title {
+            font-family: 'Major Mono Display', monospace;
+            font-size: 6rem;
+            color: var(--primary);
+            text-shadow: 
+                0 0 30px var(--glow),
+                2px 2px 0 var(--primary-dark),
+                4px 4px 0 rgba(0, 0, 0, 0.5);
+            margin-bottom: 1rem;
+            letter-spacing: 10px;
+            animation: titleFlicker 4s infinite;
+        }
+
+        .menu-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            margin-bottom: 4rem;
+            font-family: 'VT323', monospace;
+            letter-spacing: 4px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 300px;
+            margin: 0 auto;
+        }
+
+        .menu-btn {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 0;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--glow), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .menu-btn:hover {
+            background: var(--primary);
+            color: black;
+            box-shadow: 0 0 30px var(--glow);
+            border-color: white;
+        }
+
+        .menu-btn:hover::before {
+            left: 100%;
+        }
+
+        .menu-btn.primary {
+            background: var(--primary);
+            color: black;
+            border-color: white;
+        }
+
+        .menu-btn.primary:hover {
+            background: white;
+            border-color: var(--primary);
+        }
+
+        .menu-footer {
+            position: absolute;
+            bottom: 2rem;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            font-family: 'VT323', monospace;
+            letter-spacing: 2px;
+        }
+
+        /* Settings Modal */
+        .settings-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 500px;
+            max-width: 90%;
+            background: rgba(10, 10, 10, 0.95);
+            border: 2px solid var(--primary);
+            padding: 2rem;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .settings-modal.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--primary);
+            padding-bottom: 1rem;
+        }
+
+        .settings-header h2 {
+            font-family: 'Major Mono Display', monospace;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+
+        .close-settings {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-settings:hover {
+            color: white;
+        }
+
+        .settings-group {
+            margin-bottom: 2rem;
+        }
+
+        .settings-group h3 {
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .setting-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .setting-label i {
+            color: var(--primary);
+            width: 20px;
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--secondary);
+            transition: 0.3s;
+            border: 1px solid var(--primary);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--primary);
+            transition: 0.3s;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+            background-color: black;
+        }
+
+        /* Range Slider */
+        .range-slider {
+            width: 200px;
+            height: 4px;
+            background: var(--secondary);
+            border: 1px solid var(--primary);
+            -webkit-appearance: none;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--primary);
+            cursor: pointer;
+            border: 1px solid white;
+        }
+
+        /* Credits Modal */
+        .credits-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 600px;
+            max-width: 90%;
+            background: rgba(10, 10, 10, 0.95);
+            border: 2px solid var(--primary);
+            padding: 2rem;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .credits-modal.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .credits-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--primary);
+            padding-bottom: 1rem;
+        }
+
+        .credits-header h2 {
+            font-family: 'Major Mono Display', monospace;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+
+        .credits-content {
+            text-align: center;
+        }
+
+        .credit-section {
+            margin: 2rem 0;
+        }
+
+        .credit-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .credit-section p {
+            color: var(--text-light);
+            margin: 0.5rem 0;
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+        }
+
+        /* Difficulty Select */
+        .difficulty-select {
+            background: black;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0.5rem;
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 150px;
+        }
+
+        .difficulty-select option {
+            background: black;
+            color: var(--primary);
+        }
+
+        /* Animations */
+        @keyframes titleFlicker {
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.3; }
+            94% { opacity: 1; }
+            95% { opacity: 0.5; }
+            96% { opacity: 1; }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { text-shadow: 0 0 20px var(--glow); }
+            50% { text-shadow: 0 0 40px var(--glow), 0 0 60px var(--primary); }
+        }
+
+        /* VHS Effect */
+        .vhs-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.03) 50%,
+                transparent 100%
+            );
+            animation: vhsShift 8s infinite linear;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.3;
+        }
+
+        @keyframes vhsShift {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Static Noise */
+        .static-noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc0IiBudW1PY3RhdmVzPSIzIiAvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNmKSIgb3BhY2l0eT0iMC4xIiAvPjwvc3ZnPg==');
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .menu-title {
+                font-size: 3rem;
+                letter-spacing: 5px;
+            }
+            
+            .intro-line.large {
+                font-size: 2rem;
+            }
+            
+            .intro-line {
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Tela de Loading -->
+    <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-content">
-            <h1 class="loading-title">BACKROOMS</h1>
-            <div class="loading-bar">
-                <div class="loading-progress" id="loadingProgress"></div>
+            <div class="loading-logo">BACKROOMS</div>
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loadingBar"></div>
             </div>
-            <p class="loading-text" id="loadingText">Iniciando simulação dimensional...</p>
+            <div class="loading-text" id="loadingText">INITIALIZING LIMINAL SPACE...</div>
         </div>
     </div>
 
-    <!-- Tela de Menu Principal -->
-    <div class="menu-screen" id="menuScreen">
-        <div class="menu-container">
-            <h1 class="game-title">BACKROOMS</h1>
-            <p class="game-subtitle">Nível 0 - Os Escritórios Infinitos</p>
+    <!-- Intro Cinematic -->
+    <div class="intro-cinematic" id="introCinematic">
+        <div class="intro-vignette"></div>
+        <div class="intro-scanlines"></div>
+        
+        <!-- Video Element (can be replaced with actual video) -->
+        <div class="intro-video" id="introVideo"></div>
+        
+        <div class="intro-text" id="introText">
+            <div class="intro-line" id="introLine1">YOU SHOULDN'T HAVE COME HERE</div>
+            <div class="intro-line large" id="introLine2">BACKROOMS</div>
+            <div class="intro-line" id="introLine3">LEVEL 0</div>
+            <div class="intro-line small" id="introLine4">THE PLACE BETWEEN PLACES</div>
+            <div class="intro-line small" id="introLine5">NO CLIP OUT OF REALITY</div>
+        </div>
+    </div>
+
+    <!-- Three.js Container -->
+    <div id="canvas-container"></div>
+
+    <!-- Main Menu -->
+    <div class="menu-container" id="menuContainer">
+        <div class="menu-content">
+            <h1 class="menu-title">BACKROOMS</h1>
+            <p class="menu-subtitle">LIMINAL SPACE EXPERIENCE</p>
             
             <div class="menu-buttons">
-                <button class="menu-btn primary" id="startNewGame">
-                    <span class="btn-icon">🎮</span>
-                    NOVA PARTIDA
+                <button class="menu-btn primary" id="startGameBtn">
+                    <i class="fas fa-play"></i> NEW GAME
                 </button>
-                <button class="menu-btn" id="continueGame" disabled>
-                    <span class="btn-icon">⏸️</span>
-                    CONTINUAR
+                <button class="menu-btn" id="continueBtn" disabled>
+                    <i class="fas fa-save"></i> CONTINUE
                 </button>
-                <button class="menu-btn" id="menuSettings">
-                    <span class="btn-icon">⚙️</span>
-                    CONFIGURAÇÕES
+                <button class="menu-btn" id="settingsBtn">
+                    <i class="fas fa-cog"></i> SETTINGS
                 </button>
-                <button class="menu-btn" id="menuCredits">
-                    <span class="btn-icon">📜</span>
-                    CRÉDITOS
+                <button class="menu-btn" id="creditsBtn">
+                    <i class="fas fa-scroll"></i> CREDITS
                 </button>
             </div>
+        </div>
+        
+        <div class="menu-footer">
+            <p>© 2026 BACKROOMS EXPERIENCE | WASD TO MOVE | E TO INTERACT</p>
+            <p style="font-size: 0.8rem; margin-top: 0.5rem;">DO NOT TRUST THE LIGHTS</p>
+        </div>
+    </div>
 
-            <div class="menu-footer">
-                <p>Use WASD ou Setas para se mover | E para interagir</p>
-                <p class="warning-text">Alta exposição pode causar perda de sanidade</p>
+    <!-- Settings Modal -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-header">
+            <h2><i class="fas fa-cog"></i> SETTINGS</h2>
+            <button class="close-settings" id="closeSettingsBtn">&times;</button>
+        </div>
+        
+        <div class="settings-group">
+            <h3>AUDIO</h3>
+            <div class="setting-item">
+                <span class="setting-label">
+                    <i class="fas fa-volume-up"></i>
+                    Sound Effects
+                </span>
+                <label class="toggle">
+                    <input type="checkbox" id="soundToggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">
+                    <i class="fas fa-music"></i>
+                    Ambient Music
+                </span>
+                <label class="toggle">
+                    <input type="checkbox" id="musicToggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">
+                    <i class="fas fa-sliders-h"></i>
+                    Volume
+                </span>
+                <input type="range" min="0" max="100" value="70" class="range-slider" id="volumeSlider">
+            </div>
+        </div>
+        
+        <div class="settings-group">
+            <h3>GRAPHICS</h3>
+            <div class="setting-item">
+                <span class="setting-label">
+                    <i class="fas fa-film"></i>
+                    VHS Effect
+                </span>
+                <label class="toggle">
+                    <input type="checkbox" id="vhsToggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">
+                    <i class="fas fa-sun"></i>
+                    Brightness
+                </span>
+                <input type="range" min="50" max="150" value="100" class="range-slider" id="brightnessSlider">
+            </div>
+        </div>
+        
+        <div class="settings-group">
+            <h3>GAMEPLAY</h3>
+            <div class="setting-item">
+                <span class="setting-label">
+                    <i class="fas fa-skull"></i>
+                    Difficulty
+                </span>
+                <select class="difficulty-select" id="difficultySelect">
+                    <option value="easy">EASY</option>
+                    <option value="normal" selected>NORMAL</option>
+                    <option value="hard">HARD</option>
+                    <option value="nightmare">NIGHTMARE</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">
+                    <i class="fas fa-lightbulb"></i>
+                    Show Hints
+                </span>
+                <label class="toggle">
+                    <input type="checkbox" id="hintsToggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
             </div>
         </div>
     </div>
 
-    <!-- Tela de Créditos -->
-    <div class="credits-screen" id="creditsScreen">
-        <div class="credits-container">
-            <h2>CRÉDITOS</h2>
-            <div class="credits-content">
-                <p class="credit-section">Desenvolvimento</p>
+    <!-- Credits Modal -->
+    <div class="credits-modal" id="creditsModal">
+        <div class="credits-header">
+            <h2><i class="fas fa-scroll"></i> CREDITS</h2>
+            <button class="close-settings" id="closeCreditsBtn">&times;</button>
+        </div>
+        
+        <div class="credits-content">
+            <div class="credit-section">
+                <h3>DEVELOPMENT</h3>
                 <p>Brenninho123</p>
-                
-                <p class="credit-section">Inspiração</p>
+                <p>Lead Developer & Game Designer</p>
+            </div>
+            
+            <div class="credit-section">
+                <h3>INSPIRATION</h3>
                 <p>Backrooms - The Found Footage</p>
                 <p>Kane Pixels</p>
+                <p>The Liminal Space Community</p>
+            </div>
+            
+            <div class="credit-section">
+                <h3>SPECIAL THANKS</h3>
+                <p>Backrooms Community</p>
+                <p>All who keep the mystery alive</p>
+                <p>Those who never found the exit</p>
+            </div>
+            
+            <div class="credit-section">
+                <h3>SOURCES</h3>
+                <p>Three.js - 3D Library</p>
+                <p>GSAP - Animations</p>
+                <p>Font Awesome - Icons</p>
+            </div>
+            
+            <div class="credit-section">
+                <h3>VERSION</h3>
+                <p>Backrooms v1.0.0</p>
+                <p>Released 2026</p>
+            </div>
+            
+            <div class="credit-section">
+                <h3>MESSAGE</h3>
+                <p>If you're reading this...</p>
+                <p>It's already too late</p>
+                <p>Welcome to the Backrooms</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- VHS Effect (optional) -->
+    <div class="vhs-effect" id="vhsEffect"></div>
+    
+    <!-- Static Noise -->
+    <div class="static-noise"></div>
+
+    <!-- Audio Elements -->
+    <audio id="ambientAudio" loop preload="auto">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="introAudio" preload="auto">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Main Game Class
+        class BackroomsGame {
+            constructor() {
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.initialize();
+            }
+
+            initialize() {
+                this.initThree();
+                this.initLoading();
+                this.initEventListeners();
+            }
+
+            initThree() {
+                // Three.js Scene
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(0x050505);
                 
-                <p class="credit-section">Agradecimentos</p>
-                <p>Comunidade Backrooms</p>
-                <p>Todos que mantêm a chama acesa</p>
-            </div>
-            <button class="menu-btn" id="backToMenu">VOLTAR</button>
-        </div>
-    </div>
+                // Camera
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.camera.position.set(0, 0, 5);
+                
+                // Renderer
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(window.devicePixelRatio);
+                document.getElementById('canvas-container').appendChild(this.renderer.domElement);
+                
+                // Lights
+                const ambientLight = new THREE.AmbientLight(0x404060);
+                this.scene.add(ambientLight);
+                
+                // Create floating geometry
+                this.createFloatingGeometry();
+                
+                // Start animation loop
+                this.animate();
+            }
 
-    <!-- Interface do Jogo -->
-    <div class="game-interface" id="gameInterface" style="display: none;">
-        <!-- Efeitos de tela -->
-        <div class="screen-effects" id="screenEffects">
-            <div class="vignette"></div>
-            <div class="noise"></div>
-            <div class="scanlines"></div>
-            <div class="flicker" id="flickerEffect"></div>
-        </div>
+            createFloatingGeometry() {
+                // Create floating cubes (like liminal space)
+                const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0xffd966,
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                
+                for (let i = 0; i < 50; i++) {
+                    const cube = new THREE.Mesh(geometry, material);
+                    cube.position.x = (Math.random() - 0.5) * 10;
+                    cube.position.y = (Math.random() - 0.5) * 10;
+                    cube.position.z = (Math.random() - 5) * 5;
+                    cube.rotation.x = Math.random() * Math.PI;
+                    cube.rotation.y = Math.random() * Math.PI;
+                    this.scene.add(cube);
+                }
+                
+                // Add some floating lines
+                const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffd966, opacity: 0.1, transparent: true });
+                
+                for (let i = 0; i < 20; i++) {
+                    const points = [];
+                    points.push(new THREE.Vector3((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10));
+                    points.push(new THREE.Vector3((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10));
+                    
+                    const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+                    const line = new THREE.Line(lineGeometry, lineMaterial);
+                    this.scene.add(line);
+                }
+            }
 
-        <!-- HUD Principal -->
-        <div class="hud-container">
-            <!-- Status Bar -->
-            <div class="status-bar">
-                <div class="status-group">
-                    <div class="status-item">
-                        <span class="status-icon">🧠</span>
-                        <div class="status-bar-container">
-                            <div class="status-bar-fill sanity" id="sanityBar" style="width: 100%"></div>
-                        </div>
-                        <span class="status-value" id="sanityValue">100%</span>
-                    </div>
+            initLoading() {
+                const loadingBar = document.getElementById('loadingBar');
+                const loadingText = document.getElementById('loadingText');
+                let progress = 0;
+                
+                const loadingMessages = [
+                    'INITIALIZING LIMINAL SPACE...',
+                    'RENDERING INFINITE OFFICES...',
+                    'GENERATING FLUORESCENT HUM...',
+                    'CALCULATING EXIT PROBABILITY...',
+                    '0% CHANCE FOUND...',
+                    'WELCOME TO THE BACKROOMS...'
+                ];
+                
+                const interval = setInterval(() => {
+                    progress += Math.random() * 10;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        
+                        setTimeout(() => {
+                            document.getElementById('loadingScreen').style.opacity = '0';
+                            setTimeout(() => {
+                                document.getElementById('loadingScreen').style.display = 'none';
+                                this.startIntro();
+                            }, 1000);
+                        }, 500);
+                    }
+                    
+                    loadingBar.style.width = progress + '%';
+                    
+                    const messageIndex = Math.floor((progress / 100) * loadingMessages.length);
+                    loadingText.textContent = loadingMessages[Math.min(messageIndex, loadingMessages.length - 1)];
+                }, 200);
+            }
 
-                    <div class="status-item">
-                        <span class="status-icon">⚡</span>
-                        <div class="status-bar-container">
-                            <div class="status-bar-fill energy" id="energyBar" style="width: 100%"></div>
-                        </div>
-                        <span class="status-value" id="energyValue">100%</span>
-                    </div>
-                </div>
+            startIntro() {
+                const intro = document.getElementById('introCinematic');
+                intro.style.display = 'block';
+                
+                // Intro lines animation
+                const lines = [
+                    document.getElementById('introLine1'),
+                    document.getElementById('introLine2'),
+                    document.getElementById('introLine3'),
+                    document.getElementById('introLine4'),
+                    document.getElementById('introLine5')
+                ];
+                
+                // Reset lines
+                lines.forEach(line => {
+                    line.style.opacity = '0';
+                    line.style.transform = 'translateY(20px)';
+                });
+                
+                // Animate lines sequentially
+                setTimeout(() => {
+                    gsap.to(lines[0], { opacity: 1, y: 0, duration: 2, ease: 'power2.out' });
+                    
+                    setTimeout(() => {
+                        gsap.to(lines[0], { opacity: 0, y: -20, duration: 1 });
+                        gsap.to(lines[1], { opacity: 1, y: 0, duration: 2 });
+                        
+                        setTimeout(() => {
+                            gsap.to(lines[1], { opacity: 0, y: -20, duration: 1 });
+                            gsap.to(lines[2], { opacity: 1, y: 0, duration: 2 });
+                            
+                            setTimeout(() => {
+                                gsap.to(lines[2], { opacity: 0, y: -20, duration: 1 });
+                                gsap.to(lines[3], { opacity: 1, y: 0, duration: 2 });
+                                gsap.to(lines[4], { opacity: 1, y: 0, duration: 2, delay: 0.5 });
+                                
+                                setTimeout(() => {
+                                    gsap.to(intro, { opacity: 0, duration: 3, delay: 1 });
+                                    
+                                    setTimeout(() => {
+                                        intro.style.display = 'none';
+                                        this.showMainMenu();
+                                    }, 4000);
+                                }, 4000);
+                            }, 3000);
+                        }, 3000);
+                    }, 3000);
+                }, 1000);
+            }
 
-                <div class="level-indicator">
-                    <span class="level-icon">📊</span>
-                    <span class="level-text" id="levelDisplay">NÍVEL 0</span>
-                </div>
-            </div>
+            showMainMenu() {
+                const menu = document.getElementById('menuContainer');
+                menu.classList.add('visible');
+                
+                // Start ambient audio
+                const ambient = document.getElementById('ambientAudio');
+                ambient.volume = 0.3;
+                ambient.play().catch(e => console.log('Audio autoplay blocked'));
+            }
 
-            <!-- Área Principal do Jogo -->
-            <div class="game-area">
-                <!-- Canvas do Jogo (Visão Primeira Pessoa) -->
-                <canvas id="gameCanvas" class="game-canvas"></canvas>
+            initEventListeners() {
+                // Start Game
+                document.getElementById('startGameBtn').addEventListener('click', () => {
+                    this.startGame();
+                });
+                
+                // Settings
+                document.getElementById('settingsBtn').addEventListener('click', () => {
+                    document.getElementById('settingsModal').classList.add('active');
+                });
+                
+                document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+                    document.getElementById('settingsModal').classList.remove('active');
+                });
+                
+                // Credits
+                document.getElementById('creditsBtn').addEventListener('click', () => {
+                    document.getElementById('creditsModal').classList.add('active');
+                });
+                
+                document.getElementById('closeCreditsBtn').addEventListener('click', () => {
+                    document.getElementById('creditsModal').classList.remove('active');
+                });
+                
+                // Settings toggles
+                document.getElementById('soundToggle').addEventListener('change', (e) => {
+                    console.log('Sound:', e.target.checked);
+                });
+                
+                document.getElementById('musicToggle').addEventListener('change', (e) => {
+                    const ambient = document.getElementById('ambientAudio');
+                    if (e.target.checked) {
+                        ambient.play();
+                    } else {
+                        ambient.pause();
+                    }
+                });
+                
+                document.getElementById('volumeSlider').addEventListener('input', (e) => {
+                    const ambient = document.getElementById('ambientAudio');
+                    ambient.volume = e.target.value / 100;
+                });
+                
+                document.getElementById('vhsToggle').addEventListener('change', (e) => {
+                    document.getElementById('vhsEffect').style.opacity = e.target.checked ? '0.3' : '0';
+                });
+                
+                // Close modals on escape
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        document.getElementById('settingsModal').classList.remove('active');
+                        document.getElementById('creditsModal').classList.remove('active');
+                    }
+                });
+                
+                // Window resize
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
 
-                <!-- Mini-mapa -->
-                <div class="minimap" id="minimap">
-                    <div class="minimap-header">
-                        <span>🗺️ MAPA</span>
-                        <span class="minimap-coords" id="playerCoords">X:0 Y:0</span>
-                    </div>
-                    <div class="minimap-canvas-container">
-                        <canvas id="minimapCanvas" width="150" height="150"></canvas>
-                    </div>
-                </div>
+            startGame() {
+                // Hide menu
+                document.getElementById('menuContainer').classList.remove('visible');
+                
+                // Here you would initialize the actual game
+                console.log('Game started!');
+                
+                // For now, just show a message
+                alert('GAME STARTED - Full game implementation loading...');
+            }
 
-                <!-- Diário/Jornal -->
-                <div class="journal-panel" id="journalPanel">
-                    <div class="journal-header">
-                        <span>📔 DIÁRIO</span>
-                        <span class="journal-time" id="gameTime">00:00</span>
-                    </div>
-                    <div class="journal-content" id="journalContent">
-                        <p class="journal-entry">▶ Você acorda nos Backrooms...</p>
-                        <p class="journal-entry">▶ O zumbido é ensurdecedor...</p>
-                    </div>
-                </div>
-            </div>
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                // Rotate objects in scene
+                this.scene.children.forEach(child => {
+                    if (child.isMesh) {
+                        child.rotation.x += 0.001;
+                        child.rotation.y += 0.002;
+                    }
+                });
+                
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
 
-            <!-- Painel de Ações Rápidas -->
-            <div class="quick-actions">
-                <div class="inventory-quick" id="inventoryQuick">
-                    <div class="quick-slot" data-slot="1">
-                        <span class="slot-key">1</span>
-                        <span class="slot-item" id="slot1">🔦</span>
-                    </div>
-                    <div class="quick-slot" data-slot="2">
-                        <span class="slot-key">2</span>
-                        <span class="slot-item" id="slot2">💊</span>
-                    </div>
-                    <div class="quick-slot" data-slot="3">
-                        <span class="slot-key">3</span>
-                        <span class="slot-item" id="slot3">🔋</span>
-                    </div>
-                    <div class="quick-slot" data-slot="4">
-                        <span class="slot-key">4</span>
-                        <span class="slot-item" id="slot4">📻</span>
-                    </div>
-                </div>
-
-                <div class="action-hint" id="actionHint">
-                    <span class="hint-key">E</span>
-                    <span class="hint-text">Interagir</span>
-                </div>
-            </div>
-
-            <!-- Controles de Movimento (Mobile) -->
-            <div class="mobile-controls" id="mobileControls">
-                <div class="movement-pad">
-                    <button class="move-btn" data-dir="up">⬆️</button>
-                    <div class="move-row">
-                        <button class="move-btn" data-dir="left">⬅️</button>
-                        <button class="action-btn-mobile" id="mobileInteract">👆</button>
-                        <button class="move-btn" data-dir="right">➡️</button>
-                    </div>
-                    <button class="move-btn" data-dir="down">⬇️</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Painel de Inventário (Modal) -->
-        <div class="inventory-panel" id="inventoryPanel">
-            <div class="inventory-header">
-                <h3>INVENTÁRIO</h3>
-                <button class="close-panel" id="closeInventory">✕</button>
-            </div>
-            <div class="inventory-grid" id="inventoryGrid">
-                <!-- Itens serão inseridos via JS -->
-            </div>
-            <div class="inventory-stats">
-                <div class="stat">Capacidade: <span id="inventoryCapacity">0/8</span></div>
-                <div class="stat">Peso: <span id="inventoryWeight">0kg</span></div>
-            </div>
-        </div>
-
-        <!-- Sistema de Diálogo/Notas -->
-        <div class="note-display" id="noteDisplay" style="display: none;">
-            <div class="note-content">
-                <div class="note-text" id="noteText"></div>
-                <button class="note-close" id="closeNote">FECHAR</button>
-            </div>
-        </div>
-
-        <!-- Sistema de Alerta -->
-        <div class="alert-system" id="alertSystem"></div>
-    </div>
-
-    <!-- Tela de Game Over -->
-    <div class="gameover-screen" id="gameoverScreen" style="display: none;">
-        <div class="gameover-container">
-            <h1 class="gameover-title">VOCÊ SE PERDEU</h1>
-            <p class="gameover-subtitle" id="gameoverReason">Sua sanidade chegou ao fim...</p>
-            
-            <div class="gameover-stats">
-                <div class="stat-row">
-                    <span>Tempo sobrevivido:</span>
-                    <span id="survivalTime">00:00</span>
-                </div>
-                <div class="stat-row">
-                    <span>Salas exploradas:</span>
-                    <span id="roomsExplored">0</span>
-                </div>
-                <div class="stat-row">
-                    <span>Itens coletados:</span>
-                    <span id="itemsCollected">0</span>
-                </div>
-                <div class="stat-row">
-                    <span>Entidades encontradas:</span>
-                    <span id="entitiesEncountered">0</span>
-                </div>
-            </div>
-
-            <div class="gameover-buttons">
-                <button class="menu-btn primary" id="restartGame">
-                    <span class="btn-icon">🔄</span>
-                    TENTAR NOVAMENTE
-                </button>
-                <button class="menu-btn" id="backToMenuGameOver">
-                    <span class="btn-icon">🏠</span>
-                    MENU PRINCIPAL
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tela de Configurações -->
-    <div class="settings-screen" id="settingsScreen" style="display: none;">
-        <div class="settings-container">
-            <h2>CONFIGURAÇÕES</h2>
-            
-            <div class="settings-group">
-                <h3>ÁUDIO</h3>
-                <div class="setting-item">
-                    <span>Efeitos Sonoros</span>
-                    <label class="toggle">
-                        <input type="checkbox" id="soundToggle" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span>Música Ambiente</span>
-                    <label class="toggle">
-                        <input type="checkbox" id="musicToggle" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span>Volume</span>
-                    <input type="range" id="volumeSlider" min="0" max="100" value="70">
-                </div>
-            </div>
-
-            <div class="settings-group">
-                <h3>GRÁFICOS</h3>
-                <div class="setting-item">
-                    <span>Efeitos de Tela</span>
-                    <label class="toggle">
-                        <input type="checkbox" id="effectsToggle" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span>Brilho</span>
-                    <input type="range" id="brightnessSlider" min="50" max="150" value="100">
-                </div>
-            </div>
-
-            <div class="settings-group">
-                <h3>JOGABILIDADE</h3>
-                <div class="setting-item">
-                    <span>Dificuldade</span>
-                    <select id="difficultySelect">
-                        <option value="easy">Fácil</option>
-                        <option value="normal" selected>Normal</option>
-                        <option value="hard">Difícil</option>
-                        <option value="nightmare">Pesadelo</option>
-                    </select>
-                </div>
-                <div class="setting-item">
-                    <span>Mostrar Dicas</span>
-                    <label class="toggle">
-                        <input type="checkbox" id="hintsToggle" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="settings-buttons">
-                <button class="menu-btn primary" id="saveSettings">SALVAR</button>
-                <button class="menu-btn" id="closeSettings">VOLTAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sistema de Áudio (escondido) -->
-    <audio id="ambientSound" loop preload="auto">
-        <source src="assets/sounds/ambient.mp3" type="audio/mpeg">
-    </audio>
-    
-    <audio id="footstepSound" preload="auto">
-        <source src="assets/sounds/footstep.mp3" type="audio/mpeg">
-    </audio>
-    
-    <audio id="entitySound" preload="auto">
-        <source src="assets/sounds/entity.mp3" type="audio/mpeg">
-    </audio>
-    
-    <audio id="pickupSound" preload="auto">
-        <source src="assets/sounds/pickup.mp3" type="audio/mpeg">
-    </audio>
-
-    <script src="js/game.js"></script>
-    <script src="js/entities.js"></script>
-    <script src="js/items.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/audio.js"></script>
-    <script src="js/main.js"></script>
+        // Initialize game when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.game = new BackroomsGame();
+        });
+    </script>
 </body>
 </html>
