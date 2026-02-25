@@ -3,186 +3,427 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BACKROOMS: LIMINAL EXPERIENCE</title>
+    <title>BACKROOMS: LEVEL 0 - LIMINAL HORROR</title>
     
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Major+Mono+Display&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Major+Mono+Display&family=VT323&family=Special+Elite&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- Three.js for 3D effects -->
+    <!-- Three.js for 3D -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
     <!-- GSAP for animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     
     <style>
-        /* Root Variables */
+        /* ===== ROOT VARIABLES - AUTHENTIC BACKROOMS COLOR PALETTE ===== */
         :root {
-            --primary: #ffd966;
-            --primary-dark: #b8860b;
-            --secondary: #2a2a2a;
-            --accent: #dc3545;
-            --bg-dark: #0a0a0a;
-            --bg-darker: #050505;
-            --text-light: #e0e0e0;
-            --text-dim: #808080;
-            --glow: rgba(255, 217, 102, 0.3);
-            --scanline: rgba(0, 255, 0, 0.03);
+            --backrooms-yellow: #f0e68c;
+            --backrooms-yellow-dark: #c9b37e;
+            --backrooms-wall: #e8d9b5;
+            --backrooms-wall-dark: #b8a882;
+            --backrooms-carpet: #c41e3a;
+            --backrooms-carpet-dark: #8b0000;
+            --backrooms-hum: #ffffe0;
+            --backrooms-shadow: #2a2418;
+            --backrooms-flicker: #fffacd;
+            --glow-yellow: rgba(240, 230, 140, 0.3);
+            --glow-red: rgba(196, 30, 58, 0.2);
+            --scanline-color: rgba(255, 255, 255, 0.03);
         }
 
-        /* Global Styles */
+        /* ===== GLOBAL STYLES ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg-darker);
-            color: var(--text-light);
+            background: #000;
+            color: var(--backrooms-yellow);
             overflow: hidden;
             height: 100vh;
             width: 100vw;
+            cursor: crosshair;
         }
 
-        /* Loading Screen */
-        .loading-screen {
+        /* ===== AUTHENTIC BACKROOMS FOUND FOOTAGE EFFECTS ===== */
+        .found-footage-layer {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: black;
-            z-index: 10000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 1s ease;
-        }
-
-        .loading-content {
-            text-align: center;
-        }
-
-        .loading-logo {
-            font-family: 'Major Mono Display', monospace;
-            font-size: 4rem;
-            color: var(--primary);
-            text-shadow: 0 0 20px var(--glow);
-            margin-bottom: 2rem;
-            animation: pulseGlow 2s infinite;
-        }
-
-        .loading-bar-container {
-            width: 400px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            overflow: hidden;
-            margin: 2rem auto;
-        }
-
-        .loading-bar {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), white);
-            transition: width 0.3s ease;
-            box-shadow: 0 0 20px var(--glow);
-        }
-
-        .loading-text {
-            font-family: 'VT323', monospace;
-            font-size: 1.5rem;
-            color: var(--text-dim);
-            letter-spacing: 2px;
-        }
-
-        /* Intro Cinematic */
-        .intro-cinematic {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: black;
-            z-index: 9000;
-            display: none;
-            perspective: 1000px;
-        }
-
-        .intro-vignette {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, transparent 0%, black 80%);
             pointer-events: none;
-            z-index: 10;
+            z-index: 10000;
+            mix-blend-mode: overlay;
         }
 
-        .intro-scanlines {
-            position: absolute;
+        /* VHS Static Noise */
+        .static-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0px, transparent 1px);
+            opacity: 0.15;
+            animation: staticNoise 0.2s infinite;
+            pointer-events: none;
+            z-index: 10001;
+        }
+
+        @keyframes staticNoise {
+            0% { background-position: 0 0; opacity: 0.15; }
+            20% { background-position: 2px -2px; opacity: 0.18; }
+            40% { background-position: -2px 2px; opacity: 0.12; }
+            60% { background-position: 1px 1px; opacity: 0.16; }
+            80% { background-position: -1px -1px; opacity: 0.14; }
+            100% { background-position: 0 0; opacity: 0.15; }
+        }
+
+        /* Scanlines - Authentic CRT Effect */
+        .scanlines {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: repeating-linear-gradient(
                 0deg,
-                var(--scanline) 0px,
-                var(--scanline) 2px,
-                transparent 2px,
-                transparent 4px
+                rgba(0, 0, 0, 0) 0px,
+                rgba(0, 0, 0, 0.1) 1px,
+                rgba(0, 0, 0, 0.3) 2px,
+                rgba(0, 0, 0, 0.1) 3px,
+                rgba(0, 0, 0, 0) 4px
             );
             pointer-events: none;
-            z-index: 11;
+            z-index: 10002;
             opacity: 0.3;
         }
 
-        .intro-video {
-            position: absolute;
+        /* VHS Tape Artifacts */
+        .vhs-artifacts {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            opacity: 0.3;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.02) 20%, 
+                transparent 40%,
+                rgba(255, 255, 0, 0.02) 60%,
+                transparent 80%
+            );
+            animation: vhsWobble 8s infinite linear;
+            pointer-events: none;
+            z-index: 10003;
+            opacity: 0.4;
         }
 
-        .intro-text {
+        @keyframes vhsWobble {
+            0% { transform: translateX(-100%) skewX(0deg); }
+            50% { transform: translateX(0%) skewX(2deg); }
+            100% { transform: translateX(100%) skewX(0deg); }
+        }
+
+        /* Vignette - Dark corners like old footage */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.7) 100%);
+            pointer-events: none;
+            z-index: 10004;
+        }
+
+        /* Flickering lights effect - Authentic Backrooms */
+        .flicker-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 200, 0.03);
+            animation: flickerLights 0.5s infinite;
+            pointer-events: none;
+            z-index: 10005;
+            mix-blend-mode: screen;
+        }
+
+        @keyframes flickerLights {
+            0% { opacity: 0.03; }
+            25% { opacity: 0.08; }
+            30% { opacity: 0.02; }
+            35% { opacity: 0.07; }
+            40% { opacity: 0.03; }
+            90% { opacity: 0.04; }
+            95% { opacity: 0.09; }
+            100% { opacity: 0.03; }
+        }
+
+        /* Vertical hold effect */
+        .vertical-hold {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                180deg,
+                transparent 0px,
+                transparent 2px,
+                rgba(0, 0, 0, 0.1) 3px,
+                transparent 4px
+            );
+            animation: verticalRoll 10s linear infinite;
+            pointer-events: none;
+            z-index: 10006;
+            opacity: 0.2;
+        }
+
+        @keyframes verticalRoll {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        /* ===== FPS COUNTER - STEAM OVERLAY STYLE ===== */
+        .fps-counter {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #0f0;
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #0f0;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+            z-index: 20000;
+            pointer-events: none;
+            backdrop-filter: blur(2px);
+            letter-spacing: 1px;
+        }
+
+        .fps-counter::before {
+            content: '■';
+            color: #0f0;
+            margin-right: 5px;
+            animation: fpsBlink 1s infinite;
+        }
+
+        @keyframes fpsBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* ===== LOADING SCREEN - AUTHENTIC VHS STYLE ===== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 30000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 2s ease;
+            font-family: 'VT323', monospace;
+        }
+
+        .vhs-tracking {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            animation: trackingWobble 3s infinite;
+        }
+
+        @keyframes trackingWobble {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(0%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .loading-content {
+            text-align: center;
+            width: 600px;
+            max-width: 90%;
+            border: 2px solid var(--backrooms-yellow);
+            padding: 2rem;
+            position: relative;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .loading-content::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+        }
+
+        .vhs-label {
+            font-size: 0.8rem;
+            color: var(--backrooms-yellow);
+            text-align: left;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+            letter-spacing: 2px;
+        }
+
+        .loading-title {
+            font-family: 'Special Elite', cursive;
+            font-size: 3rem;
+            color: var(--backrooms-yellow);
+            text-shadow: 0 0 10px var(--glow-yellow);
+            margin-bottom: 2rem;
+            letter-spacing: 5px;
+        }
+
+        .loading-subtitle {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .loading-progress-container {
+            width: 100%;
+            height: 20px;
+            background: #111;
+            border: 1px solid var(--backrooms-yellow);
+            margin: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-progress {
+            width: 0%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--backrooms-yellow) 0px,
+                var(--backrooms-yellow) 10px,
+                var(--backrooms-yellow-dark) 10px,
+                var(--backrooms-yellow-dark) 20px
+            );
+            transition: width 0.3s ease;
+            box-shadow: 0 0 20px var(--glow-yellow);
+        }
+
+        .loading-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #888;
+            margin: 1rem 0;
+        }
+
+        .loading-warning {
+            color: var(--backrooms-carpet);
+            font-size: 1rem;
+            margin-top: 2rem;
+            animation: warningBlink 2s infinite;
+        }
+
+        @keyframes warningBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ===== INTRO CINEMATIC - AUTHENTIC FOUND FOOTAGE ===== */
+        .intro-cinematic {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 25000;
+            display: none;
+        }
+
+        .intro-timestamp {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-family: 'VT323', monospace;
+            color: var(--backrooms-yellow);
+            font-size: 1.2rem;
+            z-index: 20;
+            opacity: 0.7;
+        }
+
+        .intro-counter {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            font-family: 'VT323', monospace;
+            color: var(--backrooms-carpet);
+            font-size: 1rem;
+            z-index: 20;
+            opacity: 0.5;
+        }
+
+        .intro-text-container {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 20;
             width: 80%;
             max-width: 800px;
+            z-index: 20;
+            text-align: center;
         }
 
         .intro-line {
             font-family: 'VT323', monospace;
+            color: var(--backrooms-yellow);
             font-size: 2rem;
-            color: var(--primary);
-            text-shadow: 0 0 10px var(--glow);
+            text-shadow: 0 0 10px var(--glow-yellow);
             margin: 1rem 0;
             opacity: 0;
             transform: translateY(20px);
+            line-height: 1.4;
         }
 
         .intro-line.large {
             font-size: 4rem;
-            font-family: 'Major Mono Display', monospace;
+            font-family: 'Special Elite', cursive;
+            color: var(--backrooms-yellow-dark);
         }
 
         .intro-line.small {
             font-size: 1.2rem;
-            color: var(--text-dim);
+            color: #888;
         }
 
-        /* Three.js Canvas */
+        .intro-line.glitch {
+            animation: glitchText 0.5s infinite;
+        }
+
+        @keyframes glitchText {
+            0%, 100% { text-shadow: 2px 0 0 red, -2px 0 0 blue; }
+            25% { text-shadow: -2px 0 0 red, 2px 0 0 blue; }
+            50% { text-shadow: 2px 0 0 blue, -2px 0 0 red; }
+            75% { text-shadow: -2px 0 0 blue, 2px 0 0 red; }
+        }
+
+        /* ===== 3D BACKROOMS SCENE ===== */
         #canvas-container {
             position: fixed;
             top: 0;
@@ -190,9 +431,10 @@
             width: 100%;
             height: 100%;
             z-index: 1;
+            filter: contrast(1.1) brightness(0.9) sepia(0.2);
         }
 
-        /* Main Menu */
+        /* ===== MAIN MENU - BACKROOMS STYLE ===== */
         .menu-container {
             position: fixed;
             top: 0;
@@ -202,12 +444,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            z-index: 1000;
             opacity: 0;
             visibility: hidden;
             transition: opacity 2s ease;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
         }
 
         .menu-container.visible {
@@ -220,6 +462,22 @@
             transform: translateY(30px);
             opacity: 0;
             transition: all 1s ease 0.5s;
+            width: 500px;
+            max-width: 90%;
+            border: 1px solid var(--backrooms-yellow);
+            padding: 3rem 2rem;
+            position: relative;
+        }
+
+        .menu-content::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 1px dashed rgba(240, 230, 140, 0.3);
+            pointer-events: none;
         }
 
         .menu-container.visible .menu-content {
@@ -228,22 +486,32 @@
         }
 
         .menu-title {
-            font-family: 'Major Mono Display', monospace;
-            font-size: 6rem;
-            color: var(--primary);
+            font-family: 'Special Elite', cursive;
+            font-size: 5rem;
+            color: var(--backrooms-yellow);
             text-shadow: 
-                0 0 30px var(--glow),
-                2px 2px 0 var(--primary-dark),
-                4px 4px 0 rgba(0, 0, 0, 0.5);
-            margin-bottom: 1rem;
+                0 0 20px var(--glow-yellow),
+                2px 2px 0 var(--backrooms-carpet);
+            margin-bottom: 0.5rem;
             letter-spacing: 10px;
-            animation: titleFlicker 4s infinite;
+            animation: titleFlicker 3s infinite;
+        }
+
+        @keyframes titleFlicker {
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.3; }
+            94% { opacity: 1; }
+            95% { opacity: 0.5; }
+            96% { opacity: 1; }
+            97% { opacity: 0.8; }
+            98% { opacity: 1; }
         }
 
         .menu-subtitle {
-            font-size: 1.2rem;
-            color: var(--text-dim);
-            margin-bottom: 4rem;
+            font-size: 1rem;
+            color: var(--backrooms-carpet);
+            margin-bottom: 3rem;
             font-family: 'VT323', monospace;
             letter-spacing: 4px;
         }
@@ -252,25 +520,22 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            width: 300px;
-            margin: 0 auto;
+            margin-bottom: 2rem;
         }
 
         .menu-btn {
             background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            padding: 1rem 2rem;
-            font-size: 1.2rem;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
+            border: 1px solid var(--backrooms-yellow);
+            color: var(--backrooms-yellow);
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-family: 'VT323', monospace;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            border-radius: 0;
         }
 
         .menu-btn::before {
@@ -280,15 +545,14 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, var(--glow), transparent);
+            background: linear-gradient(90deg, transparent, rgba(240, 230, 140, 0.2), transparent);
             transition: left 0.5s ease;
         }
 
         .menu-btn:hover {
-            background: var(--primary);
-            color: black;
-            box-shadow: 0 0 30px var(--glow);
-            border-color: white;
+            background: var(--backrooms-yellow);
+            color: #000;
+            border-color: #fff;
         }
 
         .menu-btn:hover::before {
@@ -296,14 +560,23 @@
         }
 
         .menu-btn.primary {
-            background: var(--primary);
-            color: black;
-            border-color: white;
+            background: var(--backrooms-carpet);
+            color: var(--backrooms-yellow);
+            border-color: var(--backrooms-yellow);
         }
 
         .menu-btn.primary:hover {
-            background: white;
-            border-color: var(--primary);
+            background: var(--backrooms-yellow);
+            color: var(--backrooms-carpet);
+        }
+
+        .menu-warning {
+            color: var(--backrooms-carpet);
+            font-size: 0.9rem;
+            font-family: 'VT323', monospace;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px dashed rgba(240, 230, 140, 0.3);
         }
 
         .menu-footer {
@@ -312,13 +585,12 @@
             left: 0;
             width: 100%;
             text-align: center;
-            color: var(--text-dim);
-            font-size: 0.9rem;
+            color: #444;
+            font-size: 0.8rem;
             font-family: 'VT323', monospace;
-            letter-spacing: 2px;
         }
 
-        /* Settings Modal */
+        /* ===== SETTINGS MODAL ===== */
         .settings-modal {
             position: fixed;
             top: 50%;
@@ -327,13 +599,14 @@
             width: 500px;
             max-width: 90%;
             background: rgba(10, 10, 10, 0.95);
-            border: 2px solid var(--primary);
+            border: 1px solid var(--backrooms-yellow);
             padding: 2rem;
-            z-index: 1000;
+            z-index: 2000;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
+            font-family: 'VT323', monospace;
         }
 
         .settings-modal.active {
@@ -347,27 +620,27 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
-            border-bottom: 1px solid var(--primary);
+            border-bottom: 1px solid var(--backrooms-yellow);
             padding-bottom: 1rem;
         }
 
         .settings-header h2 {
-            font-family: 'Major Mono Display', monospace;
-            color: var(--primary);
+            color: var(--backrooms-yellow);
+            font-size: 2rem;
             letter-spacing: 2px;
         }
 
         .close-settings {
             background: none;
             border: none;
-            color: var(--primary);
+            color: var(--backrooms-yellow);
             font-size: 2rem;
             cursor: pointer;
             transition: color 0.3s ease;
         }
 
         .close-settings:hover {
-            color: white;
+            color: var(--backrooms-carpet);
         }
 
         .settings-group {
@@ -375,10 +648,10 @@
         }
 
         .settings-group h3 {
-            color: var(--text-dim);
+            color: var(--backrooms-yellow-dark);
             margin-bottom: 1rem;
-            font-size: 1rem;
-            letter-spacing: 2px;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
         }
 
         .setting-item {
@@ -388,17 +661,7 @@
             margin-bottom: 1rem;
             padding: 0.5rem;
             background: rgba(255, 255, 255, 0.05);
-        }
-
-        .setting-label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .setting-label i {
-            color: var(--primary);
-            width: 20px;
+            border-left: 2px solid var(--backrooms-carpet);
         }
 
         /* Toggle Switch */
@@ -422,9 +685,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: var(--secondary);
+            background-color: #333;
             transition: 0.3s;
-            border: 1px solid var(--primary);
+            border: 1px solid var(--backrooms-yellow);
         }
 
         .toggle-slider:before {
@@ -434,25 +697,25 @@
             width: 22px;
             left: 3px;
             bottom: 3px;
-            background-color: var(--primary);
+            background-color: var(--backrooms-yellow);
             transition: 0.3s;
         }
 
         input:checked + .toggle-slider {
-            background-color: var(--primary);
+            background-color: var(--backrooms-carpet);
         }
 
         input:checked + .toggle-slider:before {
             transform: translateX(30px);
-            background-color: black;
+            background-color: #fff;
         }
 
         /* Range Slider */
         .range-slider {
             width: 200px;
             height: 4px;
-            background: var(--secondary);
-            border: 1px solid var(--primary);
+            background: #333;
+            border: 1px solid var(--backrooms-yellow);
             -webkit-appearance: none;
         }
 
@@ -460,12 +723,29 @@
             -webkit-appearance: none;
             width: 16px;
             height: 16px;
-            background: var(--primary);
+            background: var(--backrooms-yellow);
             cursor: pointer;
-            border: 1px solid white;
+            border: 1px solid #fff;
         }
 
-        /* Credits Modal */
+        /* Difficulty Select */
+        .difficulty-select {
+            background: #000;
+            border: 1px solid var(--backrooms-yellow);
+            color: var(--backrooms-yellow);
+            padding: 0.5rem;
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 150px;
+        }
+
+        .difficulty-select option {
+            background: #000;
+            color: var(--backrooms-yellow);
+        }
+
+        /* ===== CREDITS MODAL ===== */
         .credits-modal {
             position: fixed;
             top: 50%;
@@ -474,15 +754,16 @@
             width: 600px;
             max-width: 90%;
             background: rgba(10, 10, 10, 0.95);
-            border: 2px solid var(--primary);
+            border: 1px solid var(--backrooms-yellow);
             padding: 2rem;
-            z-index: 1000;
+            z-index: 2000;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
             max-height: 80vh;
             overflow-y: auto;
+            font-family: 'VT323', monospace;
         }
 
         .credits-modal.active {
@@ -496,14 +777,13 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
-            border-bottom: 1px solid var(--primary);
+            border-bottom: 1px solid var(--backrooms-yellow);
             padding-bottom: 1rem;
         }
 
         .credits-header h2 {
-            font-family: 'Major Mono Display', monospace;
-            color: var(--primary);
-            letter-spacing: 2px;
+            color: var(--backrooms-yellow);
+            font-size: 2rem;
         }
 
         .credits-content {
@@ -512,91 +792,67 @@
 
         .credit-section {
             margin: 2rem 0;
+            padding: 1rem;
+            border: 1px dashed rgba(240, 230, 140, 0.3);
         }
 
         .credit-section h3 {
-            color: var(--primary);
+            color: var(--backrooms-carpet);
             margin-bottom: 1rem;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
         }
 
         .credit-section p {
-            color: var(--text-light);
+            color: var(--backrooms-yellow);
             margin: 0.5rem 0;
-            font-family: 'VT323', monospace;
             font-size: 1.2rem;
         }
 
-        /* Difficulty Select */
-        .difficulty-select {
-            background: black;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 0.5rem;
+        /* ===== IN-GAME HUD (for when game starts) ===== */
+        .game-hud {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: var(--backrooms-yellow);
             font-family: 'VT323', monospace;
-            font-size: 1rem;
-            cursor: pointer;
-            width: 150px;
+            font-size: 1.2rem;
+            z-index: 5000;
+            opacity: 0;
+            transition: opacity 1s ease;
+            text-shadow: 0 0 5px #000;
         }
 
-        .difficulty-select option {
-            background: black;
-            color: var(--primary);
+        .game-hud.visible {
+            opacity: 1;
         }
 
-        /* Animations */
-        @keyframes titleFlicker {
-            0%, 100% { opacity: 1; }
-            92% { opacity: 1; }
-            93% { opacity: 0.3; }
-            94% { opacity: 1; }
-            95% { opacity: 0.5; }
-            96% { opacity: 1; }
+        .sanity-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
-        @keyframes pulseGlow {
-            0%, 100% { text-shadow: 0 0 20px var(--glow); }
-            50% { text-shadow: 0 0 40px var(--glow), 0 0 60px var(--primary); }
+        .sanity-bar {
+            width: 200px;
+            height: 10px;
+            background: #333;
+            border: 1px solid var(--backrooms-yellow);
         }
 
-        /* VHS Effect */
-        .vhs-effect {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .sanity-fill {
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent 0%,
-                rgba(255, 255, 255, 0.03) 50%,
-                transparent 100%
-            );
-            animation: vhsShift 8s infinite linear;
-            pointer-events: none;
-            z-index: 9999;
-            opacity: 0.3;
+            background: var(--backrooms-yellow);
+            transition: width 0.3s ease;
         }
 
-        @keyframes vhsShift {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        .location-indicator {
+            color: #666;
+            font-size: 0.9rem;
         }
 
-        /* Static Noise */
-        .static-noise {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc0IiBudW1PY3RhdmVzPSIzIiAvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNmKSIgb3BhY2l0eT0iMC4xIiAvPjwvc3ZnPg==');
-            opacity: 0.03;
-            pointer-events: none;
-            z-index: 9998;
-        }
-
-        /* Responsive */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .menu-title {
                 font-size: 3rem;
@@ -608,153 +864,166 @@
             }
             
             .intro-line {
-                font-size: 1rem;
+                font-size: 1.2rem;
+            }
+            
+            .loading-title {
+                font-size: 2rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
+    <!-- FPS Counter - Real-time performance monitor -->
+    <div class="fps-counter" id="fpsCounter">FPS: <span id="fpsValue">60</span></div>
+
+    <!-- Found Footage Effect Layers -->
+    <div class="found-footage-layer">
+        <div class="static-overlay"></div>
+        <div class="scanlines"></div>
+        <div class="vhs-artifacts"></div>
+        <div class="vignette"></div>
+        <div class="flicker-layer"></div>
+        <div class="vertical-hold"></div>
+    </div>
+
+    <!-- Loading Screen - Authentic VHS Style -->
     <div class="loading-screen" id="loadingScreen">
+        <div class="vhs-tracking"></div>
         <div class="loading-content">
-            <div class="loading-logo">BACKROOMS</div>
-            <div class="loading-bar-container">
-                <div class="loading-bar" id="loadingBar"></div>
+            <div class="vhs-label">VHS PLAYBACK // TRACKING...</div>
+            <h1 class="loading-title">BACKROOMS</h1>
+            <div class="loading-subtitle">LIMINAL SPACE ARCHIVE #0001</div>
+            
+            <div class="loading-progress-container">
+                <div class="loading-progress" id="loadingProgress"></div>
             </div>
-            <div class="loading-text" id="loadingText">INITIALIZING LIMINAL SPACE...</div>
+            
+            <div class="loading-stats">
+                <span>TIME: <span id="loadingTime">00:00</span></span>
+                <span>DATE: 02/25/2026</span>
+                <span>TAPE: SP-120</span>
+            </div>
+            
+            <div id="loadingMessage" class="loading-warning">LOADING TAPE...</div>
+            
+            <div style="margin-top: 2rem; font-size: 0.8rem; color: #333;">
+                ⚠️ DO NOT TURN OFF THE DEVICE ⚠️
+            </div>
         </div>
     </div>
 
-    <!-- Intro Cinematic -->
+    <!-- Intro Cinematic - Authentic Found Footage -->
     <div class="intro-cinematic" id="introCinematic">
-        <div class="intro-vignette"></div>
-        <div class="intro-scanlines"></div>
+        <div class="intro-timestamp" id="introTimestamp">02:47:23</div>
+        <div class="intro-counter" id="introCounter">TAPE REMAINING: 23:14</div>
         
-        <!-- Video Element (can be replaced with actual video) -->
-        <div class="intro-video" id="introVideo"></div>
-        
-        <div class="intro-text" id="introText">
-            <div class="intro-line" id="introLine1">YOU SHOULDN'T HAVE COME HERE</div>
-            <div class="intro-line large" id="introLine2">BACKROOMS</div>
-            <div class="intro-line" id="introLine3">LEVEL 0</div>
-            <div class="intro-line small" id="introLine4">THE PLACE BETWEEN PLACES</div>
-            <div class="intro-line small" id="introLine5">NO CLIP OUT OF REALITY</div>
+        <div class="intro-text-container" id="introText">
+            <div class="intro-line" id="introLine1">[STATIC]</div>
+            <div class="intro-line" id="introLine2">I SHOULDN'T HAVE CLIPPED THROUGH...</div>
+            <div class="intro-line large" id="introLine3">BACKROOMS</div>
+            <div class="intro-line" id="introLine4">LEVEL 0 - THE OFFICE</div>
+            <div class="intro-line small" id="introLine5">6 BILLION SQUARE MILES OF YELLOW</div>
+            <div class="intro-line small" id="introLine6">THE HUM NEVER STOPS...</div>
+            <div class="intro-line glitch" id="introLine7">THEY ARE WATCHING</div>
         </div>
     </div>
 
-    <!-- Three.js Container -->
+    <!-- Three.js Canvas Container -->
     <div id="canvas-container"></div>
 
     <!-- Main Menu -->
     <div class="menu-container" id="menuContainer">
         <div class="menu-content">
             <h1 class="menu-title">BACKROOMS</h1>
-            <p class="menu-subtitle">LIMINAL SPACE EXPERIENCE</p>
+            <p class="menu-subtitle">LEVEL 0 // NO CLIP ZONE</p>
             
             <div class="menu-buttons">
                 <button class="menu-btn primary" id="startGameBtn">
-                    <i class="fas fa-play"></i> NEW GAME
+                    <i class="fas fa-play"></i> ENTER THE BACKROOMS
                 </button>
                 <button class="menu-btn" id="continueBtn" disabled>
-                    <i class="fas fa-save"></i> CONTINUE
+                    <i class="fas fa-save"></i> CONTINUE TAPE
                 </button>
                 <button class="menu-btn" id="settingsBtn">
-                    <i class="fas fa-cog"></i> SETTINGS
+                    <i class="fas fa-cog"></i> VHS SETTINGS
                 </button>
                 <button class="menu-btn" id="creditsBtn">
-                    <i class="fas fa-scroll"></i> CREDITS
+                    <i class="fas fa-scroll"></i> ARCHIVE CREDITS
                 </button>
+            </div>
+            
+            <div class="menu-warning">
+                ⚠️ PROLONGED EXPOSURE MAY CAUSE SANITY LOSS ⚠️
             </div>
         </div>
         
         <div class="menu-footer">
-            <p>© 2026 BACKROOMS EXPERIENCE | WASD TO MOVE | E TO INTERACT</p>
-            <p style="font-size: 0.8rem; margin-top: 0.5rem;">DO NOT TRUST THE LIGHTS</p>
+            <p>© 2026 BACKROOMS ARCHIVE | FOUND FOOTAGE SIMULATION</p>
         </div>
     </div>
 
     <!-- Settings Modal -->
     <div class="settings-modal" id="settingsModal">
         <div class="settings-header">
-            <h2><i class="fas fa-cog"></i> SETTINGS</h2>
+            <h2><i class="fas fa-cog"></i> VHS SETTINGS</h2>
             <button class="close-settings" id="closeSettingsBtn">&times;</button>
         </div>
         
         <div class="settings-group">
             <h3>AUDIO</h3>
             <div class="setting-item">
-                <span class="setting-label">
-                    <i class="fas fa-volume-up"></i>
-                    Sound Effects
-                </span>
+                <span><i class="fas fa-volume-up"></i> THE HUM</span>
                 <label class="toggle">
                     <input type="checkbox" id="soundToggle" checked>
                     <span class="toggle-slider"></span>
                 </label>
             </div>
             <div class="setting-item">
-                <span class="setting-label">
-                    <i class="fas fa-music"></i>
-                    Ambient Music
-                </span>
+                <span><i class="fas fa-music"></i> AMBIENT STATIC</span>
                 <label class="toggle">
                     <input type="checkbox" id="musicToggle" checked>
                     <span class="toggle-slider"></span>
                 </label>
             </div>
             <div class="setting-item">
-                <span class="setting-label">
-                    <i class="fas fa-sliders-h"></i>
-                    Volume
-                </span>
+                <span><i class="fas fa-sliders-h"></i> TAPE VOLUME</span>
                 <input type="range" min="0" max="100" value="70" class="range-slider" id="volumeSlider">
             </div>
         </div>
         
         <div class="settings-group">
-            <h3>GRAPHICS</h3>
+            <h3>VHS EFFECTS</h3>
             <div class="setting-item">
-                <span class="setting-label">
-                    <i class="fas fa-film"></i>
-                    VHS Effect
-                </span>
+                <span><i class="fas fa-film"></i> STATIC NOISE</span>
                 <label class="toggle">
-                    <input type="checkbox" id="vhsToggle" checked>
+                    <input type="checkbox" id="staticToggle" checked>
                     <span class="toggle-slider"></span>
                 </label>
             </div>
             <div class="setting-item">
-                <span class="setting-label">
-                    <i class="fas fa-sun"></i>
-                    Brightness
-                </span>
-                <input type="range" min="50" max="150" value="100" class="range-slider" id="brightnessSlider">
+                <span><i class="fas fa-sun"></i> FLICKER INTENSITY</span>
+                <input type="range" min="0" max="100" value="70" class="range-slider" id="flickerSlider">
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-adjust"></i> VIGNETTE</span>
+                <label class="toggle">
+                    <input type="checkbox" id="vignetteToggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
             </div>
         </div>
         
         <div class="settings-group">
-            <h3>GAMEPLAY</h3>
+            <h3>DIFFICULTY</h3>
             <div class="setting-item">
-                <span class="setting-label">
-                    <i class="fas fa-skull"></i>
-                    Difficulty
-                </span>
+                <span><i class="fas fa-skull"></i> BACKROOMS LEVEL</span>
                 <select class="difficulty-select" id="difficultySelect">
-                    <option value="easy">EASY</option>
-                    <option value="normal" selected>NORMAL</option>
-                    <option value="hard">HARD</option>
-                    <option value="nightmare">NIGHTMARE</option>
+                    <option value="easy">LEVEL 0 - SAFE</option>
+                    <option value="normal" selected>LEVEL 1 - HABITABLE</option>
+                    <option value="hard">LEVEL 2 - PIPE DREAMS</option>
+                    <option value="nightmare">LEVEL 3 - ELECTRICAL STATION</option>
                 </select>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">
-                    <i class="fas fa-lightbulb"></i>
-                    Show Hints
-                </span>
-                <label class="toggle">
-                    <input type="checkbox" id="hintsToggle" checked>
-                    <span class="toggle-slider"></span>
-                </label>
             </div>
         </div>
     </div>
@@ -762,75 +1031,112 @@
     <!-- Credits Modal -->
     <div class="credits-modal" id="creditsModal">
         <div class="credits-header">
-            <h2><i class="fas fa-scroll"></i> CREDITS</h2>
+            <h2><i class="fas fa-scroll"></i> ARCHIVE CREDITS</h2>
             <button class="close-settings" id="closeCreditsBtn">&times;</button>
         </div>
         
         <div class="credits-content">
             <div class="credit-section">
-                <h3>DEVELOPMENT</h3>
-                <p>Brenninho123</p>
-                <p>Lead Developer & Game Designer</p>
+                <h3>FOUND FOOTAGE BY</h3>
+                <p>BRENNINHO123</p>
+                <p>LOST IN THE BACKROOMS • 2026</p>
             </div>
             
             <div class="credit-section">
-                <h3>INSPIRATION</h3>
-                <p>Backrooms - The Found Footage</p>
-                <p>Kane Pixels</p>
-                <p>The Liminal Space Community</p>
+                <h3>THE BACKROOMS LORE</h3>
+                <p>ORIGINAL CONCEPT BY 4CHAN</p>
+                <p>EXPANDED BY KANE PIXELS</p>
+                <p>THE LIMINAL SPACE COMMUNITY</p>
             </div>
             
             <div class="credit-section">
-                <h3>SPECIAL THANKS</h3>
-                <p>Backrooms Community</p>
-                <p>All who keep the mystery alive</p>
-                <p>Those who never found the exit</p>
+                <h3>THOSE WHO DIDN'T MAKE IT</h3>
+                <p>In memory of everyone who noclipped</p>
+                <p>and never found their way back...</p>
             </div>
             
             <div class="credit-section">
-                <h3>SOURCES</h3>
-                <p>Three.js - 3D Library</p>
-                <p>GSAP - Animations</p>
-                <p>Font Awesome - Icons</p>
+                <h3>TECHNICAL</h3>
+                <p>THREE.JS - 3D RENDERING</p>
+                <p>GSAP - VHS ANIMATIONS</p>
+                <p>FOUND FOOTAGE EFFECTS</p>
             </div>
             
             <div class="credit-section">
-                <h3>VERSION</h3>
-                <p>Backrooms v1.0.0</p>
-                <p>Released 2026</p>
-            </div>
-            
-            <div class="credit-section">
-                <h3>MESSAGE</h3>
-                <p>If you're reading this...</p>
-                <p>It's already too late</p>
-                <p>Welcome to the Backrooms</p>
+                <h3>WARNING</h3>
+                <p>IF YOU'RE WATCHING THIS TAPE</p>
+                <p>IT'S ALREADY TOO LATE</p>
+                <p>WELCOME TO THE BACKROOMS</p>
+                <p style="color: var(--backrooms-carpet); margin-top: 1rem;">THERE IS NO ESCAPE</p>
             </div>
         </div>
     </div>
 
-    <!-- VHS Effect (optional) -->
-    <div class="vhs-effect" id="vhsEffect"></div>
-    
-    <!-- Static Noise -->
-    <div class="static-noise"></div>
+    <!-- In-Game HUD (hidden until game starts) -->
+    <div class="game-hud" id="gameHud">
+        <div class="sanity-indicator">
+            <span>SANITY:</span>
+            <div class="sanity-bar">
+                <div class="sanity-fill" id="sanityFill" style="width: 100%;"></div>
+            </div>
+        </div>
+        <div class="location-indicator" id="locationIndicator">LEVEL 0 // COORDINATES: ???</div>
+    </div>
 
     <!-- Audio Elements -->
-    <audio id="ambientAudio" loop preload="auto">
+    <audio id="theHum" loop preload="auto">
         <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
     </audio>
     
-    <audio id="introAudio" preload="auto">
+    <audio id="staticAudio" loop preload="auto">
         <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
     </audio>
 
     <script>
-        // Main Game Class
+        // ===== FPS COUNTER =====
+        class FPSCounter {
+            constructor() {
+                this.fps = 60;
+                this.fpsElement = document.getElementById('fpsValue');
+                this.lastFrameTime = performance.now();
+                this.frameCount = 0;
+                this.update();
+            }
+
+            update() {
+                const now = performance.now();
+                const delta = now - this.lastFrameTime;
+                this.frameCount++;
+
+                if (delta >= 1000) {
+                    this.fps = Math.round((this.frameCount * 1000) / delta);
+                    this.fpsElement.textContent = this.fps;
+                    
+                    // Change color based on performance
+                    if (this.fps < 30) {
+                        this.fpsElement.style.color = '#ff0000';
+                    } else if (this.fps < 50) {
+                        this.fpsElement.style.color = '#ffff00';
+                    } else {
+                        this.fpsElement.style.color = '#00ff00';
+                    }
+                    
+                    this.lastFrameTime = now;
+                    this.frameCount = 0;
+                }
+
+                requestAnimationFrame(() => this.update());
+            }
+        }
+
+        // ===== BACKROOMS GAME CLASS =====
         class BackroomsGame {
             constructor() {
                 this.scene = null;
                 this.camera = null;
                 this.renderer = null;
+                this.startTime = Date.now();
+                this.fpsCounter = new FPSCounter();
                 this.initialize();
             }
 
@@ -838,107 +1144,197 @@
                 this.initThree();
                 this.initLoading();
                 this.initEventListeners();
+                this.startLoadingSequence();
             }
 
             initThree() {
-                // Three.js Scene
+                // Three.js Scene - Authentic Backrooms atmosphere
                 this.scene = new THREE.Scene();
-                this.scene.background = new THREE.Color(0x050505);
+                this.scene.background = new THREE.Color(0x1a150e);
+                this.scene.fog = new THREE.FogExp2(0x1a150e, 0.02);
                 
                 // Camera
                 this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                this.camera.position.set(0, 0, 5);
+                this.camera.position.set(0, 1.6, 5);
                 
                 // Renderer
-                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
-                this.renderer.setPixelRatio(window.devicePixelRatio);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 document.getElementById('canvas-container').appendChild(this.renderer.domElement);
                 
-                // Lights
-                const ambientLight = new THREE.AmbientLight(0x404060);
+                // Lights - Fluorescent style
+                const ambientLight = new THREE.AmbientLight(0x404030);
                 this.scene.add(ambientLight);
                 
-                // Create floating geometry
-                this.createFloatingGeometry();
+                const directionalLight = new THREE.DirectionalLight(0xfff0c0, 0.5);
+                directionalLight.position.set(1, 2, 1);
+                this.scene.add(directionalLight);
                 
-                // Start animation loop
+                // Create authentic Backrooms environment
+                this.createBackroomsScene();
+                
+                // Start animation
                 this.animate();
             }
 
-            createFloatingGeometry() {
-                // Create floating cubes (like liminal space)
-                const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-                const material = new THREE.MeshBasicMaterial({ 
-                    color: 0xffd966,
-                    wireframe: true,
+            createBackroomsScene() {
+                // Yellow walls
+                const wallMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0xe8d9b5,
+                    emissive: 0x221c10,
+                    roughness: 0.7,
+                    metalness: 0.1
+                });
+                
+                // Carpet floor (red)
+                const floorMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0xc41e3a,
+                    roughness: 0.9,
+                    emissive: 0x220000
+                });
+
+                // Create infinite grid of offices
+                for (let x = -5; x <= 5; x++) {
+                    for (let z = -5; z <= 5; z++) {
+                        // Floor tiles
+                        const floorTile = new THREE.Mesh(
+                            new THREE.BoxGeometry(0.9, 0.1, 0.9),
+                            floorMaterial
+                        );
+                        floorTile.position.set(x * 1.5, -0.05, z * 1.5);
+                        this.scene.add(floorTile);
+                        
+                        // Walls (only at edges)
+                        if (Math.random() > 0.7) {
+                            const wall = new THREE.Mesh(
+                                new THREE.BoxGeometry(0.2, 2, 1.5),
+                                wallMaterial
+                            );
+                            wall.position.set(x * 1.5, 1, z * 1.5 + 0.8);
+                            this.scene.add(wall);
+                        }
+                        
+                        // Fluorescent lights (yellow glow)
+                        if (Math.random() > 0.8) {
+                            const light = new THREE.PointLight(0xfff0c0, 0.5, 3);
+                            light.position.set(x * 1.5, 2, z * 1.5);
+                            this.scene.add(light);
+                            
+                            // Light fixture
+                            const fixture = new THREE.Mesh(
+                                new THREE.BoxGeometry(0.3, 0.1, 0.6),
+                                new THREE.MeshStandardMaterial({ color: 0xcccccc, emissive: 0x332200 })
+                            );
+                            fixture.position.set(x * 1.5, 1.9, z * 1.5);
+                            this.scene.add(fixture);
+                        }
+                    }
+                }
+                
+                // Add floating particles (dust)
+                const particleGeometry = new THREE.BufferGeometry();
+                const particleCount = 500;
+                const positions = new Float32Array(particleCount * 3);
+                
+                for (let i = 0; i < particleCount * 3; i += 3) {
+                    positions[i] = (Math.random() - 0.5) * 20;
+                    positions[i+1] = (Math.random() - 0.5) * 5;
+                    positions[i+2] = (Math.random() - 0.5) * 20;
+                }
+                
+                particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                
+                const particleMaterial = new THREE.PointsMaterial({
+                    color: 0xfff0c0,
+                    size: 0.02,
                     transparent: true,
                     opacity: 0.3
                 });
                 
-                for (let i = 0; i < 50; i++) {
-                    const cube = new THREE.Mesh(geometry, material);
-                    cube.position.x = (Math.random() - 0.5) * 10;
-                    cube.position.y = (Math.random() - 0.5) * 10;
-                    cube.position.z = (Math.random() - 5) * 5;
-                    cube.rotation.x = Math.random() * Math.PI;
-                    cube.rotation.y = Math.random() * Math.PI;
-                    this.scene.add(cube);
-                }
-                
-                // Add some floating lines
-                const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffd966, opacity: 0.1, transparent: true });
-                
-                for (let i = 0; i < 20; i++) {
-                    const points = [];
-                    points.push(new THREE.Vector3((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10));
-                    points.push(new THREE.Vector3((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10));
-                    
-                    const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-                    const line = new THREE.Line(lineGeometry, lineMaterial);
-                    this.scene.add(line);
-                }
+                const particles = new THREE.Points(particleGeometry, particleMaterial);
+                this.scene.add(particles);
             }
 
             initLoading() {
-                const loadingBar = document.getElementById('loadingBar');
-                const loadingText = document.getElementById('loadingText');
-                let progress = 0;
+                this.loadingScreen = document.getElementById('loadingScreen');
+                this.loadingProgress = document.getElementById('loadingProgress');
+                this.loadingMessage = document.getElementById('loadingMessage');
+                this.loadingTime = document.getElementById('loadingTime');
                 
                 const loadingMessages = [
-                    'INITIALIZING LIMINAL SPACE...',
-                    'RENDERING INFINITE OFFICES...',
-                    'GENERATING FLUORESCENT HUM...',
-                    'CALCULATING EXIT PROBABILITY...',
-                    '0% CHANCE FOUND...',
-                    'WELCOME TO THE BACKROOMS...'
+                    'LOADING TAPE...',
+                    'TRACKING SIGNAL...',
+                    'STABILIZING STATIC...',
+                    'ACCESSING BACKROOMS ARCHIVE...',
+                    'WARNING: REALITY GLITCH DETECTED...',
+                    'PREPARING LIMINAL SPACE...',
+                    'THE HUM IS GETTING LOUDER...',
+                    'DO NOT LOOK BEHIND YOU...',
+                    'LOADING COMPLETE...'
                 ];
                 
+                this.loadingMessages = loadingMessages;
+            }
+
+            startLoadingSequence() {
+                let progress = 0;
+                let messageIndex = 0;
+                
                 const interval = setInterval(() => {
-                    progress += Math.random() * 10;
+                    progress += Math.random() * 2 + 0.5;
+                    
                     if (progress >= 100) {
                         progress = 100;
                         clearInterval(interval);
                         
                         setTimeout(() => {
-                            document.getElementById('loadingScreen').style.opacity = '0';
+                            this.loadingScreen.style.opacity = '0';
                             setTimeout(() => {
-                                document.getElementById('loadingScreen').style.display = 'none';
+                                this.loadingScreen.style.display = 'none';
                                 this.startIntro();
                             }, 1000);
                         }, 500);
                     }
                     
-                    loadingBar.style.width = progress + '%';
+                    this.loadingProgress.style.width = progress + '%';
                     
-                    const messageIndex = Math.floor((progress / 100) * loadingMessages.length);
-                    loadingText.textContent = loadingMessages[Math.min(messageIndex, loadingMessages.length - 1)];
-                }, 200);
+                    // Update loading message
+                    messageIndex = Math.floor((progress / 100) * this.loadingMessages.length);
+                    if (messageIndex >= this.loadingMessages.length) {
+                        messageIndex = this.loadingMessages.length - 1;
+                    }
+                    this.loadingMessage.textContent = this.loadingMessages[messageIndex];
+                    
+                    // Update time
+                    const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+                    const minutes = Math.floor(elapsed / 60);
+                    const seconds = elapsed % 60;
+                    this.loadingTime.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }, 100);
             }
 
             startIntro() {
                 const intro = document.getElementById('introCinematic');
                 intro.style.display = 'block';
+                
+                // Update timestamp in real-time
+                setInterval(() => {
+                    const date = new Date();
+                    document.getElementById('introTimestamp').textContent = 
+                        `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+                }, 1000);
+                
+                // Counter countdown
+                let tapeRemaining = 23 * 60 + 14; // 23:14
+                setInterval(() => {
+                    tapeRemaining--;
+                    if (tapeRemaining < 0) tapeRemaining = 0;
+                    const minutes = Math.floor(tapeRemaining / 60);
+                    const seconds = tapeRemaining % 60;
+                    document.getElementById('introCounter').textContent = 
+                        `TAPE REMAINING: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }, 1000);
                 
                 // Intro lines animation
                 const lines = [
@@ -946,43 +1342,62 @@
                     document.getElementById('introLine2'),
                     document.getElementById('introLine3'),
                     document.getElementById('introLine4'),
-                    document.getElementById('introLine5')
+                    document.getElementById('introLine5'),
+                    document.getElementById('introLine6'),
+                    document.getElementById('introLine7')
                 ];
                 
-                // Reset lines
                 lines.forEach(line => {
-                    line.style.opacity = '0';
-                    line.style.transform = 'translateY(20px)';
+                    if (line) {
+                        line.style.opacity = '0';
+                        line.style.transform = 'translateY(20px)';
+                    }
                 });
                 
-                // Animate lines sequentially
+                // Animate lines with authentic timing
                 setTimeout(() => {
-                    gsap.to(lines[0], { opacity: 1, y: 0, duration: 2, ease: 'power2.out' });
+                    if (lines[0]) gsap.to(lines[0], { opacity: 1, y: 0, duration: 1 });
                     
                     setTimeout(() => {
-                        gsap.to(lines[0], { opacity: 0, y: -20, duration: 1 });
-                        gsap.to(lines[1], { opacity: 1, y: 0, duration: 2 });
+                        if (lines[0]) gsap.to(lines[0], { opacity: 0, duration: 0.5 });
+                        if (lines[1]) gsap.to(lines[1], { opacity: 1, y: 0, duration: 1.5 });
                         
                         setTimeout(() => {
-                            gsap.to(lines[1], { opacity: 0, y: -20, duration: 1 });
-                            gsap.to(lines[2], { opacity: 1, y: 0, duration: 2 });
+                            if (lines[1]) gsap.to(lines[1], { opacity: 0, duration: 0.5 });
+                            if (lines[2]) gsap.to(lines[2], { opacity: 1, y: 0, duration: 2 });
                             
                             setTimeout(() => {
-                                gsap.to(lines[2], { opacity: 0, y: -20, duration: 1 });
-                                gsap.to(lines[3], { opacity: 1, y: 0, duration: 2 });
-                                gsap.to(lines[4], { opacity: 1, y: 0, duration: 2, delay: 0.5 });
+                                if (lines[2]) gsap.to(lines[2], { opacity: 0, duration: 0.5 });
+                                if (lines[3]) gsap.to(lines[3], { opacity: 1, y: 0, duration: 1.5 });
                                 
                                 setTimeout(() => {
-                                    gsap.to(intro, { opacity: 0, duration: 3, delay: 1 });
+                                    if (lines[3]) gsap.to(lines[3], { opacity: 0, duration: 0.5 });
+                                    if (lines[4]) gsap.to(lines[4], { opacity: 1, y: 0, duration: 1.5 });
                                     
                                     setTimeout(() => {
-                                        intro.style.display = 'none';
-                                        this.showMainMenu();
-                                    }, 4000);
-                                }, 4000);
+                                        if (lines[4]) gsap.to(lines[4], { opacity: 0, duration: 0.5 });
+                                        if (lines[5]) gsap.to(lines[5], { opacity: 1, y: 0, duration: 1.5 });
+                                        
+                                        setTimeout(() => {
+                                            if (lines[5]) gsap.to(lines[5], { opacity: 0, duration: 0.5 });
+                                            if (lines[6]) {
+                                                gsap.to(lines[6], { opacity: 1, y: 0, duration: 2 });
+                                                
+                                                setTimeout(() => {
+                                                    gsap.to(intro, { opacity: 0, duration: 3 });
+                                                    
+                                                    setTimeout(() => {
+                                                        intro.style.display = 'none';
+                                                        this.showMainMenu();
+                                                    }, 3000);
+                                                }, 3000);
+                                            }
+                                        }, 3000);
+                                    }, 3000);
+                                }, 3000);
                             }, 3000);
                         }, 3000);
-                    }, 3000);
+                    }, 2000);
                 }, 1000);
             }
 
@@ -990,10 +1405,10 @@
                 const menu = document.getElementById('menuContainer');
                 menu.classList.add('visible');
                 
-                // Start ambient audio
-                const ambient = document.getElementById('ambientAudio');
-                ambient.volume = 0.3;
-                ambient.play().catch(e => console.log('Audio autoplay blocked'));
+                // Start the hum
+                const theHum = document.getElementById('theHum');
+                theHum.volume = 0.3;
+                theHum.play().catch(e => console.log('Audio autoplay blocked'));
             }
 
             initEventListeners() {
@@ -1020,30 +1435,44 @@
                     document.getElementById('creditsModal').classList.remove('active');
                 });
                 
-                // Settings toggles
+                // Settings controls
                 document.getElementById('soundToggle').addEventListener('change', (e) => {
-                    console.log('Sound:', e.target.checked);
+                    const theHum = document.getElementById('theHum');
+                    if (e.target.checked) {
+                        theHum.play();
+                    } else {
+                        theHum.pause();
+                    }
                 });
                 
                 document.getElementById('musicToggle').addEventListener('change', (e) => {
-                    const ambient = document.getElementById('ambientAudio');
+                    const staticAudio = document.getElementById('staticAudio');
                     if (e.target.checked) {
-                        ambient.play();
+                        staticAudio.play();
                     } else {
-                        ambient.pause();
+                        staticAudio.pause();
                     }
                 });
                 
                 document.getElementById('volumeSlider').addEventListener('input', (e) => {
-                    const ambient = document.getElementById('ambientAudio');
-                    ambient.volume = e.target.value / 100;
+                    const theHum = document.getElementById('theHum');
+                    theHum.volume = e.target.value / 100;
                 });
                 
-                document.getElementById('vhsToggle').addEventListener('change', (e) => {
-                    document.getElementById('vhsEffect').style.opacity = e.target.checked ? '0.3' : '0';
+                // Effect toggles
+                document.getElementById('staticToggle').addEventListener('change', (e) => {
+                    document.querySelector('.static-overlay').style.opacity = e.target.checked ? '0.15' : '0';
                 });
                 
-                // Close modals on escape
+                document.getElementById('vignetteToggle').addEventListener('change', (e) => {
+                    document.querySelector('.vignette').style.opacity = e.target.checked ? '1' : '0';
+                });
+                
+                document.getElementById('flickerSlider').addEventListener('input', (e) => {
+                    document.querySelector('.flicker-layer').style.opacity = e.target.value / 100 * 0.1;
+                });
+                
+                // Close modals with Escape
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
                         document.getElementById('settingsModal').classList.remove('active');
@@ -1063,29 +1492,60 @@
                 // Hide menu
                 document.getElementById('menuContainer').classList.remove('visible');
                 
-                // Here you would initialize the actual game
-                console.log('Game started!');
+                // Show game HUD
+                const gameHud = document.getElementById('gameHud');
+                gameHud.classList.add('visible');
                 
-                // For now, just show a message
-                alert('GAME STARTED - Full game implementation loading...');
+                // Start decreasing sanity
+                let sanity = 100;
+                setInterval(() => {
+                    sanity -= 0.1;
+                    if (sanity < 0) sanity = 0;
+                    document.getElementById('sanityFill').style.width = sanity + '%';
+                    
+                    // Random location updates
+                    const locations = [
+                        'LEVEL 0 // THE OFFICE',
+                        'THE ENDLESS YELLOW',
+                        'COORDINATES: ???',
+                        'NEAR THE HUM',
+                        'FLUORESCENT SECTOR',
+                        'ABANDONED ZONE',
+                        'THE NO-CLIP ZONE'
+                    ];
+                    document.getElementById('locationIndicator').textContent = 
+                        locations[Math.floor(Math.random() * locations.length)];
+                    
+                    if (sanity <= 0) {
+                        alert('YOU LOST YOUR SANITY... GAME OVER');
+                        location.reload();
+                    }
+                }, 1000);
+                
+                // Move camera slightly for immersion
+                let time = 0;
+                setInterval(() => {
+                    time += 0.1;
+                    if (this.camera) {
+                        this.camera.position.x = Math.sin(time) * 0.5;
+                        this.camera.position.y = 1.6 + Math.sin(time * 2) * 0.05;
+                    }
+                }, 50);
             }
 
             animate() {
                 requestAnimationFrame(() => this.animate());
                 
-                // Rotate objects in scene
-                this.scene.children.forEach(child => {
-                    if (child.isMesh) {
-                        child.rotation.x += 0.001;
-                        child.rotation.y += 0.002;
-                    }
-                });
+                // Rotate scene slightly for liminal feeling
+                if (this.scene) {
+                    this.scene.rotation.y += 0.0005;
+                }
                 
                 this.renderer.render(this.scene, this.camera);
             }
         }
 
-        // Initialize game when DOM is ready
+        // Start the game when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             window.game = new BackroomsGame();
         });
