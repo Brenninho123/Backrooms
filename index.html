@@ -2,23 +2,134 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Backrooms 3D</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backrooms - O Jogo</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- Fonte para dar um ar mais misterioso -->
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="container">
+        <!-- Tela de título -->
+        <header class="game-header">
+            <h1 class="game-title">BACKROOMS</h1>
+            <p class="game-subtitle">Você está preso em um labirinto infinito de escritórios amarelados...</p>
+        </header>
 
-<div id="menu">
-    <h1>BACKROOMS</h1>
-    <button id="startBtn">INICIAR</button>
-</div>
+        <!-- Área principal do jogo -->
+        <main class="game-container">
+            <!-- Canvas do jogo (se for usar gráficos) -->
+            <canvas id="gameCanvas" class="game-canvas"></canvas>
 
-<div id="hud">
-    <div class="bar"><div id="flashFill"></div></div>
-    <div class="bar"><div id="sanityFill"></div></div>
-</div>
+            <!-- Painel de status -->
+            <div class="status-panel">
+                <div class="status-item">
+                    <span class="status-label">Sanidade</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill sanity" style="width: 85%"></div>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Nível</span>
+                    <span class="status-value" id="levelDisplay">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Itens</span>
+                    <span class="status-value" id="itemsCount">0</span>
+                </div>
+            </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+            <!-- Área de texto/jornal -->
+            <div class="journal-area">
+                <div class="journal-header">
+                    <span class="journal-title">Diário</span>
+                    <span class="journal-date">Dia 1</span>
+                </div>
+                <div class="journal-content" id="journalText">
+                    <p>Você acorda em uma sala de escritório amarelada...</p>
+                    <p>O zumbido das lâmpadas fluorescentes preenche o silêncio.</p>
+                </div>
+            </div>
 
-<script type="module" src="js/main.js"></script>
+            <!-- Controles do jogo -->
+            <div class="controls-panel">
+                <button class="control-btn move" data-direction="up">⬆️</button>
+                <div class="move-row">
+                    <button class="control-btn move" data-direction="left">⬅️</button>
+                    <button class="control-btn action" id="interactBtn">👆</button>
+                    <button class="control-btn move" data-direction="right">➡️</button>
+                </div>
+                <button class="control-btn move" data-direction="down">⬇️</button>
+            </div>
+
+            <!-- Menu de ações -->
+            <div class="action-menu">
+                <button class="action-btn" id="inventoryBtn">
+                    <span class="btn-icon">🎒</span>
+                    Inventário
+                </button>
+                <button class="action-btn" id="mapBtn">
+                    <span class="btn-icon">🗺️</span>
+                    Mapa
+                </button>
+                <button class="action-btn" id="settingsBtn">
+                    <span class="btn-icon">⚙️</span>
+                    Configurações
+                </button>
+            </div>
+        </main>
+
+        <!-- Rodapé -->
+        <footer class="game-footer">
+            <p>Use as setas para se mover | Espaço para interagir</p>
+        </footer>
+    </div>
+
+    <!-- Modal de Inventário (inicialmente escondido) -->
+    <div class="modal" id="inventoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Inventário</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <ul class="inventory-list">
+                    <li class="inventory-item empty">Vazio</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Configurações -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Configurações</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-item">
+                    <label>Efeitos Sonoros</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>Música</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>Volume</label>
+                    <input type="range" min="0" max="100" value="70">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/ui.js"></script>
 </body>
 </html>
