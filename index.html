@@ -2,455 +2,94 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BACKROOMS: INFINITE LEVELS - FOUND FOOTAGE HORROR</title>
-    
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Major+Mono+Display&family=VT323&family=Special+Elite&family=Creepster&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
-    <!-- GSAP -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    
-    <!-- Hammer.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BACKROOMS - Windows Edition</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        /* ===== RESET ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+        /* Estilos específicos para Windows */
+        .window-titlebar {
+            -webkit-app-region: drag;
+            height: 30px;
+            background: #1a1a1a;
             position: fixed;
-            background: #000;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+            color: #f0e68c;
             font-family: 'VT323', monospace;
+            border-bottom: 1px solid #8b1e3f;
         }
 
-        /* ===== SYSTEM INFO ===== */
-        .system-info {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            color: #0f0;
-            padding: 8px 12px;
-            border: 1px solid #0f0;
-            z-index: 1000000;
-            font-size: 12px;
-            line-height: 1.5;
-            backdrop-filter: blur(2px);
-            border-radius: 4px;
+        .window-controls {
+            -webkit-app-region: no-drag;
         }
 
-        /* ===== SAVE INDICATOR ===== */
-        .save-indicator {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.8);
+        .window-controls button {
+            background: none;
+            border: none;
             color: #f0e68c;
-            padding: 8px 12px;
-            border: 1px solid #f0e68c;
-            z-index: 1000000;
-            font-size: 12px;
-            animation: savePulse 1s;
-        }
-
-        @keyframes savePulse {
-            0% { opacity: 0; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.1); }
-            100% { opacity: 0; transform: scale(1); }
-        }
-
-        /* ===== LEVEL INDICATOR ===== */
-        .level-indicator {
-            position: fixed;
-            top: 60px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            color: #8b1e3f;
-            padding: 8px 12px;
-            border: 1px solid #8b1e3f;
-            z-index: 1000000;
-            font-size: 14px;
-        }
-
-        /* ===== FOUND FOOTAGE EFFECTS ===== */
-        .effect-layer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 900000;
-        }
-
-        .static {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: repeating-radial-gradient(circle at 30% 40%, rgba(255,255,255,0.1) 0px, transparent 2px);
-            animation: staticAnim 0.1s infinite;
-        }
-
-        @keyframes staticAnim {
-            0% { background-position: 0 0; }
-            100% { background-position: 10px -10px; }
-        }
-
-        .scanlines {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(0deg, transparent 0px, rgba(0,0,0,0.2) 1px, transparent 2px);
-        }
-
-        .vignette {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.9) 100%);
-        }
-
-        .flicker {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,200,0.03);
-            animation: flickerAnim 0.3s infinite;
-        }
-
-        @keyframes flickerAnim {
-            0%,100% { opacity: 0.03; }
-            10% { opacity: 0.15; }
-            20% { opacity: 0.02; }
-        }
-
-        /* ===== MOBILE CONTROLS - CORRIGIDO ===== */
-        .touch-area {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 800000;
-            display: none;
-            touch-action: none;
-        }
-
-        .joystick-container {
-            position: fixed;
-            bottom: 40px;
-            left: 40px;
-            width: 140px;
-            height: 140px;
-            z-index: 800001;
-            display: none;
-            touch-action: none;
-        }
-
-        .joystick-base {
-            position: absolute;
-            width: 140px;
-            height: 140px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 3px solid #8b1e3f;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 0 30px rgba(139, 30, 63, 0.3);
-        }
-
-        .joystick-thumb {
-            width: 60px;
-            height: 60px;
-            background: #8b1e3f;
-            border: 2px solid #f0e68c;
-            border-radius: 50%;
+            width: 30px;
+            height: 30px;
             cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #f0e68c;
-            font-size: 20px;
-            transition: transform 0.05s linear;
-            box-shadow: 0 0 20px rgba(240, 230, 140, 0.5);
-            will-change: transform;
         }
 
-        .action-button-mobile {
-            position: fixed;
-            bottom: 40px;
-            right: 40px;
-            width: 110px;
-            height: 110px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 3px solid #8b1e3f;
-            border-radius: 50%;
-            z-index: 800001;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            color: #f0e68c;
-            font-size: 40px;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 0 30px rgba(139, 30, 63, 0.3);
-            touch-action: none;
-        }
-
-        .action-button-mobile:active {
-            transform: scale(0.9);
+        .window-controls button:hover {
             background: #8b1e3f;
         }
 
-        @media (hover: none) and (pointer: coarse) {
-            .touch-area, .joystick-container, .action-button-mobile {
-                display: flex;
-            }
+        body {
+            padding-top: 30px;
         }
 
-        /* ===== INTRO ===== */
-        .intro-cinematic {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 950000;
-            display: none;
-        }
-
-        .intro-static {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: repeating-radial-gradient(circle at 30% 40%, rgba(255,255,255,0.15) 0px, transparent 1px);
-            animation: staticAnim 0.05s infinite;
-        }
-
-        .intro-text-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            max-width: 1000px;
-            text-align: center;
-            z-index: 10;
-        }
-
-        .intro-line {
-            font-family: 'Special Elite', cursive;
-            color: #f0e68c;
-            font-size: 3rem;
-            text-shadow: 0 0 30px #f0e68c;
-            margin: 2rem 0;
-            opacity: 0;
-            transform: translateY(30px);
-        }
-
-        .intro-line.horror {
-            color: #8b1e3f;
-            text-shadow: 0 0 50px #ff0000;
-        }
-
-        /* ===== MENU ===== */
-        .menu-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 900000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 2s ease;
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(10px);
-        }
-
-        .menu-container.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .menu-content {
-            text-align: center;
-            transform: translateY(30px);
-            opacity: 0;
-            transition: all 1s ease 0.5s;
-            width: 600px;
-            max-width: 90%;
-            border: 3px solid #8b1e3f;
-            padding: 3rem;
-            background: rgba(0,0,0,0.8);
-            box-shadow: 0 0 100px rgba(139,30,63,0.3);
-        }
-
-        .menu-container.visible .menu-content {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .menu-title {
-            font-family: 'Creepster', cursive;
-            font-size: 6rem;
-            color: #8b1e3f;
-            text-shadow: 0 0 50px #ff0000, 3px 3px 0 #f0e68c;
-            margin-bottom: 1rem;
-        }
-
-        .menu-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        .menu-btn {
-            background: transparent;
-            border: 2px solid #8b1e3f;
-            color: #f0e68c;
-            padding: 1rem;
-            font-size: 1.2rem;
-            font-family: 'VT323', monospace;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .menu-btn:hover {
-            background: #8b1e3f;
-            color: #000;
-            border-color: #f0e68c;
-        }
-
-        .menu-btn.continue {
-            border-color: #f0e68c;
-            color: #f0e68c;
-        }
-
-        /* ===== GAME HUD ===== */
         .game-hud {
+            bottom: 30px;
+        }
+
+        /* Indicador de versão Windows */
+        .windows-badge {
             position: fixed;
-            bottom: 200px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 300px;
-            background: rgba(0,0,0,0.7);
-            border: 2px solid #8b1e3f;
-            padding: 1rem;
-            z-index: 700000;
-            color: #f0e68c;
-            font-family: 'VT323', monospace;
-            opacity: 0;
-            transition: opacity 1s ease;
-            backdrop-filter: blur(5px);
-        }
-
-        .game-hud.visible {
-            opacity: 1;
-        }
-
-        .sanity-bar {
-            width: 100%;
-            height: 15px;
-            background: #222;
-            border: 1px solid #8b1e3f;
-            margin: 0.5rem 0;
-        }
-
-        .sanity-fill {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #f0e68c, #8b1e3f);
-            transition: width 0.3s ease;
-        }
-
-        /* ===== CANVAS ===== */
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        /* ===== LOADING ===== */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
+            bottom: 10px;
+            right: 10px;
+            color: #444;
+            font-size: 10px;
+            font-family: monospace;
             z-index: 1000000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 2s ease;
-        }
-
-        .loading-content {
-            text-align: center;
-            border: 3px solid #8b1e3f;
-            padding: 3rem;
-            background: rgba(0,0,0,0.9);
-        }
-
-        .progress-bar {
-            width: 300px;
-            height: 20px;
-            background: #111;
-            border: 2px solid #8b1e3f;
-            margin: 2rem 0;
-        }
-
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background: #8b1e3f;
-            transition: width 0.3s ease;
         }
     </style>
 </head>
 <body>
+    <!-- Windows Title Bar -->
+    <div class="window-titlebar">
+        <span>🎮 BACKROOMS - Windows Edition</span>
+        <div class="window-controls">
+            <button id="minimizeBtn">─</button>
+            <button id="maximizeBtn">□</button>
+            <button id="closeBtn">✕</button>
+        </div>
+    </div>
+
     <!-- System Info -->
-    <div class="system-info">
+    <div class="system-info" style="top: 40px;">
         <div>FPS: <span id="fpsValue">60</span></div>
-        <div>LVL: <span id="levelDisplay">0</span></div>
-        <div>SAVE: <span id="saveStatus">-</span></div>
+        <div>RAM: <span id="ramValue">0 MB</span></div>
+        <div>WINDOWS</div>
     </div>
 
-    <!-- Save Indicator -->
-    <div class="save-indicator" id="saveIndicator">💾 SAVED</div>
-
-    <!-- Level Indicator -->
-    <div class="level-indicator" id="levelIndicator">
-        LEVEL <span id="currentLevel">0</span> - <span id="levelName">THE OFFICE</span>
+    <!-- Save Manager -->
+    <div class="save-manager" id="saveManager" style="display: none;">
+        <div class="save-manager-content">
+            <h2>💾 GERENCIAR SAVES</h2>
+            <div id="saveList" class="save-list"></div>
+            <button class="menu-btn" id="closeSaveManager">FECHAR</button>
+        </div>
     </div>
 
-    <!-- Found Footage Effects -->
+    <!-- Restante do jogo (mesmo código anterior) -->
     <div class="effect-layer">
         <div class="static"></div>
         <div class="scanlines"></div>
@@ -458,621 +97,211 @@
         <div class="flicker"></div>
     </div>
 
-    <!-- Mobile Controls - CORRIGIDO -->
-    <div class="touch-area" id="touchArea"></div>
-    
-    <div class="joystick-container" id="joystickContainer">
-        <div class="joystick-base">
-            <div class="joystick-thumb" id="joystickThumb">
-                <i class="fas fa-arrows-alt"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="action-button-mobile" id="actionButtonMobile">
-        <i class="fas fa-hand-pointer"></i>
-    </div>
-
-    <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
-        <div class="loading-content">
-            <h1 style="color: #8b1e3f; font-size: 3rem;">BACKROOMS</h1>
-            <div class="progress-bar">
-                <div class="progress-fill" id="loadingProgress"></div>
-            </div>
-            <div id="loadingMessage" style="color: #f0e68c;">LOADING...</div>
-        </div>
+        <!-- Loading content -->
     </div>
 
-    <!-- Intro -->
     <div class="intro-cinematic" id="introCinematic">
-        <div class="intro-static"></div>
-        <div class="intro-text-container">
-            <div class="intro-line" id="introLine1">[SIGNAL LOST]</div>
-            <div class="intro-line" id="introLine2">YOU NOCLIPPED THROUGH REALITY...</div>
-            <div class="intro-line horror" id="introLine3">THE BACKROOMS</div>
-            <div class="intro-line" id="introLine4">LEVEL 0 - THE INFINITE OFFICE</div>
-            <div class="intro-line" id="introLine5">THE HUM NEVER STOPS</div>
-            <div class="intro-line horror" id="introLine6">THEY ARE HERE</div>
-            <div class="intro-line" id="introLine7">WATCHING FROM THE CORNERS</div>
-            <div class="intro-line" id="introLine8">THERE IS NO ESCAPE</div>
-        </div>
+        <!-- Intro content -->
     </div>
 
-    <!-- Menu -->
     <div class="menu-container" id="menuContainer">
         <div class="menu-content">
             <h1 class="menu-title">BACKROOMS</h1>
+            <h2 style="color: #8b1e3f; margin-bottom: 2rem;">WINDOWS EDITION</h2>
             <div class="menu-buttons">
-                <button class="menu-btn" id="newGameBtn">🆕 NEW GAME</button>
-                <button class="menu-btn continue" id="continueBtn">💾 CONTINUE (LEVEL <span id="continueLevel">0</span>)</button>
-                <button class="menu-btn" id="levelSelectBtn">📋 LEVEL SELECT</button>
+                <button class="menu-btn" id="newGameBtn">🎮 NOVO JOGO</button>
+                <button class="menu-btn" id="continueBtn">💾 CONTINUAR</button>
+                <button class="menu-btn" id="loadGameBtn">📂 CARREGAR SAVE</button>
+                <button class="menu-btn" id="settingsBtn">⚙️ CONFIGURAÇÕES</button>
+                <button class="menu-btn" id="exitBtn">❌ SAIR</button>
             </div>
         </div>
     </div>
 
-    <!-- Level Select Modal -->
-    <div class="settings-modal" id="levelSelectModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.95); border: 3px solid #8b1e3f; padding: 2rem; z-index: 950000; color: #f0e68c; max-width: 90%; max-height: 80vh; overflow-y: auto;">
-        <h2 style="margin-bottom: 2rem;">SELECT LEVEL</h2>
-        <div id="levelList" style="display: grid; gap: 1rem;"></div>
-        <button class="menu-btn" id="closeLevelSelect" style="margin-top: 2rem;">CLOSE</button>
-    </div>
-
-    <!-- Game HUD -->
     <div class="game-hud" id="gameHud">
-        <div>🧠 SANITY</div>
+        <div>🧠 SANIDADE</div>
         <div class="sanity-bar">
             <div class="sanity-fill" id="sanityFill"></div>
         </div>
-        <div id="locationDisplay">LEVEL 0 - THE OFFICE</div>
+        <div>NÍVEL <span id="currentLevel">0</span> - <span id="levelName">THE OFFICE</span></div>
     </div>
 
-    <!-- Canvas -->
     <div id="canvas-container"></div>
 
-    <!-- Audio -->
-    <audio id="humSound" loop preload="auto">
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    <div class="windows-badge">BACKROOMS v1.0 • Windows Native</div>
+
+    <audio id="humSound" loop>
+        <source src="assets/sounds/hum.mp3" type="audio/mpeg">
     </audio>
 
     <script>
-        // ===== SISTEMA DE SALVAMENTO AUTOMÁTICO =====
-        class SaveSystem {
-            constructor() {
-                this.saveKey = 'backrooms_save';
-            }
+        // Integração com Electron
+        const { electronAPI } = window;
 
-            save(level, sanity, position) {
-                const saveData = {
-                    level: level,
-                    sanity: sanity,
-                    position: position,
-                    timestamp: Date.now(),
-                    unlockedLevels: this.getUnlockedLevels()
-                };
-                
-                localStorage.setItem(this.saveKey, JSON.stringify(saveData));
-                
-                // Show save indicator
-                const indicator = document.getElementById('saveIndicator');
-                indicator.style.opacity = '1';
-                setTimeout(() => {
-                    indicator.style.opacity = '0';
-                }, 1000);
-                
-                document.getElementById('saveStatus').textContent = '✔';
-                setTimeout(() => {
-                    document.getElementById('saveStatus').textContent = '-';
-                }, 2000);
-                
-                return saveData;
-            }
+        // Controles da janela
+        document.getElementById('minimizeBtn').addEventListener('click', () => {
+            if (electronAPI) electronAPI.send('minimize-window');
+        });
 
-            load() {
-                const save = localStorage.getItem(this.saveKey);
-                return save ? JSON.parse(save) : null;
-            }
+        document.getElementById('maximizeBtn').addEventListener('click', () => {
+            if (electronAPI) electronAPI.send('maximize-window');
+        });
 
-            getUnlockedLevels() {
-                const save = this.load();
-                return save ? save.unlockedLevels || [0] : [0];
-            }
+        document.getElementById('closeBtn').addEventListener('click', () => {
+            if (electronAPI) electronAPI.send('close-window');
+        });
 
-            unlockLevel(level) {
-                const unlocked = this.getUnlockedLevels();
-                if (!unlocked.includes(level)) {
-                    unlocked.push(level);
-                    const save = this.load();
-                    if (save) {
-                        save.unlockedLevels = unlocked;
-                        localStorage.setItem(this.saveKey, JSON.stringify(save));
-                    }
-                }
-                return unlocked;
+        // Monitor de RAM (Windows)
+        setInterval(() => {
+            if (performance.memory) {
+                const used = Math.round(performance.memory.usedJSHeapSize / (1024 * 1024));
+                document.getElementById('ramValue').textContent = used + ' MB';
             }
-        }
+        }, 1000);
 
-        // ===== FPS COUNTER =====
-        class FPSCounter {
-            constructor() {
-                this.fps = 60;
-                this.lastFrame = performance.now();
-                this.frames = 0;
-                this.element = document.getElementById('fpsValue');
-                this.update();
-            }
-
-            update() {
-                const now = performance.now();
-                this.frames++;
-                
-                if (now - this.lastFrame >= 1000) {
-                    this.fps = this.frames;
-                    this.element.textContent = this.fps;
-                    this.frames = 0;
-                    this.lastFrame = now;
-                }
-                
-                requestAnimationFrame(() => this.update());
-            }
-        }
-
-        // ===== MOBILE CONTROLS - CORRIGIDO =====
-        class MobileControls {
+        // Sistema de saves com Electron
+        class WindowsSaveManager {
             constructor(game) {
                 this.game = game;
-                this.joystickContainer = document.getElementById('joystickContainer');
-                this.joystickThumb = document.getElementById('joystickThumb');
-                this.touchArea = document.getElementById('touchArea');
-                
-                this.moveVector = { x: 0, y: 0 };
-                this.lookVector = { x: 0, y: 0 };
-                this.active = false;
-                
-                if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
-                    this.init();
-                }
-            }
-
-            init() {
-                // Joystick - Movimento
-                const mc = new Hammer.Manager(this.joystickContainer);
-                const pan = new Hammer.Pan({ direction: Hammer.DIRECTION_ALL, threshold: 5 });
-                mc.add(pan);
-                
-                mc.on('panstart', (e) => this.onJoystickStart(e));
-                mc.on('panmove', (e) => this.onJoystickMove(e));
-                mc.on('panend', (e) => this.onJoystickEnd(e));
-                
-                // Touch Area - Olhar
-                const lc = new Hammer.Manager(this.touchArea);
-                const pan2 = new Hammer.Pan({ direction: Hammer.DIRECTION_ALL, threshold: 5 });
-                lc.add(pan2);
-                
-                lc.on('panmove', (e) => this.onLookMove(e));
-            }
-
-            onJoystickStart(e) {
-                this.active = true;
-            }
-
-            onJoystickMove(e) {
-                const rect = this.joystickContainer.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                
-                let deltaX = e.center.x - centerX;
-                let deltaY = e.center.y - centerY;
-                
-                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                const maxDistance = rect.width / 2 - 10;
-                
-                if (distance > maxDistance) {
-                    deltaX = (deltaX / distance) * maxDistance;
-                    deltaY = (deltaY / distance) * maxDistance;
-                }
-                
-                // Aplica transformação suave
-                this.joystickThumb.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-                
-                // Normaliza o vetor de movimento
-                this.moveVector = {
-                    x: deltaX / maxDistance,
-                    y: deltaY / maxDistance
-                };
-            }
-
-            onJoystickEnd(e) {
-                this.active = false;
-                this.moveVector = { x: 0, y: 0 };
-                this.joystickThumb.style.transform = 'translate(0px, 0px)';
-            }
-
-            onLookMove(e) {
-                if (!this.game.gameActive) return;
-                
-                // Câmera mais suave e responsiva
-                this.game.camera.rotation.y -= e.deltaX * 0.003;
-                this.game.camera.rotation.x -= e.deltaY * 0.003;
-                
-                // Limita o ângulo vertical
-                this.game.camera.rotation.x = Math.max(-0.8, Math.min(0.8, this.game.camera.rotation.x));
-            }
-
-            getMoveVector() {
-                return this.moveVector;
-            }
-        }
-
-        // ===== BACKROOMS GAME =====
-        class BackroomsGame {
-            constructor() {
-                this.scene = null;
-                this.camera = null;
-                this.renderer = null;
-                this.saveSystem = new SaveSystem();
-                this.fpsCounter = new FPSCounter();
-                this.mobileControls = null;
-                
-                this.currentLevel = 0;
-                this.sanity = 100;
-                this.gameActive = false;
-                this.playerPosition = { x: 0, y: 1.6, z: 5 };
-                
-                // 15 NÍVEIS DIFERENTES!
-                this.levels = [
-                    { name: 'THE INFINITE OFFICE', color: 0xe8d9b5, fog: 0x1a150e, desc: 'Yellow wallpaper, fluorescent hum' },
-                    { name: 'HABITABLE ZONE', color: 0x7c6e5e, fog: 0x2a1e1a, desc: 'Concrete walls, dim lighting' },
-                    { name: 'PIPE DREAMS', color: 0x3a2c1e, fog: 0x1a120e, desc: 'Endless pipes, dripping water' },
-                    { name: 'ELECTRICAL STATION', color: 0x1e1e2a, fog: 0x0a0a1a, desc: 'Sparks, buzzing electricity' },
-                    { name: 'THE HOTEL', color: 0x8b5a2b, fog: 0x2a1a0a, desc: 'Infinite corridors, red carpet' },
-                    { name: 'THE POOLROOMS', color: 0x2b8b8b, fog: 0x0a2a2a, desc: 'Endless pools, wet floors' },
-                    { name: 'THE MAZE', color: 0x2b4a2b, fog: 0x0a1a0a, desc: 'Hedge maze, distant whispers' },
-                    { name: 'THE METRO', color: 0x4a4a4a, fog: 0x1a1a1a, desc: 'Abandoned trains, echoing steps' },
-                    { name: 'THE HOSPITAL', color: 0x8b8b8b, fog: 0x2a2a2a, desc: 'Empty wards, flickering lights' },
-                    { name: 'THE SCHOOL', color: 0x8b6b4a, fog: 0x2a1a0a, desc: 'Desks, lockers, distant laughter' },
-                    { name: 'THE MALL', color: 0x8b4a6b, fog: 0x2a0a1a, desc: 'Abandoned stores, muzak' },
-                    { name: 'THE SEWERS', color: 0x2b4a2b, fog: 0x0a1a0a, desc: 'Dark tunnels, flowing water' },
-                    { name: 'THE LIBRARY', color: 0x8b8b4a, fog: 0x2a2a0a, desc: 'Endless books, silence' },
-                    { name: 'THE WAREHOUSE', color: 0x6b4a2b, fog: 0x1a0a0a, desc: 'Stacked crates, dark corners' },
-                    { name: 'THE THRESHOLD', color: 0x2b1a0a, fog: 0x0a0a0a, desc: 'The final level...' }
-                ];
-                
                 this.init();
             }
 
-            init() {
-                this.initThree();
-                this.initLoading();
-                this.initEventListeners();
-                this.mobileControls = new MobileControls(this);
-                this.checkSave();
-                this.startLoading();
-            }
+            async init() {
+                if (!electronAPI) return;
 
-            initThree() {
-                this.scene = new THREE.Scene();
-                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                this.camera.position.set(0, 1.6, 5);
-                
-                this.renderer = new THREE.WebGLRenderer({ antialias: true });
-                this.renderer.setSize(window.innerWidth, window.innerHeight);
-                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-                document.getElementById('canvas-container').appendChild(this.renderer.domElement);
-            }
-
-            checkSave() {
-                const save = this.saveSystem.load();
-                if (save) {
-                    document.getElementById('continueBtn').style.display = 'block';
-                    document.getElementById('continueLevel').textContent = save.level;
-                } else {
-                    document.getElementById('continueBtn').style.display = 'none';
-                }
-            }
-
-            createLevel(level) {
-                // Clear scene
-                while(this.scene.children.length > 0) {
-                    this.scene.remove(this.scene.children[0]);
-                }
-
-                const levelData = this.levels[level];
-                
-                // Set environment
-                this.scene.background = new THREE.Color(levelData.color);
-                this.scene.fog = new THREE.FogExp2(levelData.color, 0.02);
-                
-                // Lighting
-                const ambient = new THREE.AmbientLight(0x404040);
-                this.scene.add(ambient);
-                
-                // Create level geometry based on type
-                const spacing = level === 2 ? 3 : 2; // Pipes level has wider spacing
-                const wallMat = new THREE.MeshStandardMaterial({ color: levelData.color });
-                
-                for(let x = -15; x <= 15; x+=spacing) {
-                    for(let z = -15; z <= 15; z+=spacing) {
-                        // Floor
-                        const floorMat = new THREE.MeshStandardMaterial({ 
-                            color: level === 1 ? 0x4a3c2c : 
-                                   level === 2 ? 0x2a1c0a : 
-                                   level === 3 ? 0x1a1a2a : 0x8b1e3f
-                        });
-                        
-                        const floor = new THREE.Mesh(new THREE.BoxGeometry(spacing-0.1, 0.1, spacing-0.1), floorMat);
-                        floor.position.set(x, 0, z);
-                        this.scene.add(floor);
-                        
-                        // Random walls/objects
-                        if(Math.random() > 0.7) {
-                            if(level === 2) {
-                                // Pipes
-                                const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 3), 
-                                    new THREE.MeshStandardMaterial({ color: 0x8b6b4b }));
-                                pipe.position.set(x + 1, 1.5, z);
-                                this.scene.add(pipe);
-                            } else if(level === 3) {
-                                // Electrical sparks
-                                const spark = new THREE.Mesh(new THREE.SphereGeometry(0.2), 
-                                    new THREE.MeshStandardMaterial({ color: 0x4a6b8b, emissive: 0x224466 }));
-                                spark.position.set(x, 2, z);
-                                this.scene.add(spark);
-                                
-                                const light = new THREE.PointLight(0x446688, 0.5, 3);
-                                light.position.set(x, 2, z);
-                                this.scene.add(light);
-                            } else {
-                                // Walls
-                                const wall = new THREE.Mesh(new THREE.BoxGeometry(spacing-0.2, 2, 0.2), wallMat);
-                                wall.position.set(x, 1, z + 1);
-                                this.scene.add(wall);
-                            }
-                        }
-                    }
-                }
-
-                // Update displays
-                document.getElementById('currentLevel').textContent = level;
-                document.getElementById('levelName').textContent = levelData.name;
-                document.getElementById('locationDisplay').textContent = `LEVEL ${level} - ${levelData.name}`;
-                document.getElementById('levelDisplay').textContent = level;
-                
-                // Auto-save when changing levels
-                this.saveSystem.save(level, this.sanity, this.playerPosition);
-                this.saveSystem.unlockLevel(level);
-            }
-
-            initLoading() {
-                this.loadingScreen = document.getElementById('loadingScreen');
-                this.loadingProgress = document.getElementById('loadingProgress');
-                this.loadingMessage = document.getElementById('loadingMessage');
-            }
-
-            startLoading() {
-                let progress = 0;
-                const messages = [
-                    'NOCLIPPING...',
-                    'ACCESSING BACKROOMS...',
-                    'THE HUM GROWS LOUDER...',
-                    'ENTITIES DETECTED...',
-                    'DO NOT LOOK BACK...',
-                    'WELCOME TO THE BACKROOMS...'
-                ];
-                
-                const interval = setInterval(() => {
-                    progress += Math.random() * 2 + 1;
-                    
-                    if(progress >= 100) {
-                        progress = 100;
-                        clearInterval(interval);
-                        
-                        setTimeout(() => {
-                            this.loadingScreen.style.opacity = '0';
-                            setTimeout(() => {
-                                this.loadingScreen.style.display = 'none';
-                                this.startIntro();
-                            }, 1000);
-                        }, 500);
-                    }
-                    
-                    this.loadingProgress.style.width = progress + '%';
-                    const msgIndex = Math.floor((progress / 100) * messages.length);
-                    this.loadingMessage.textContent = messages[Math.min(msgIndex, messages.length-1)];
-                }, 100);
-            }
-
-            startIntro() {
-                const intro = document.getElementById('introCinematic');
-                intro.style.display = 'block';
-                
-                const lines = document.querySelectorAll('.intro-line');
-                lines.forEach((line, i) => {
-                    setTimeout(() => {
-                        gsap.to(line, {
-                            opacity: 1,
-                            y: 0,
-                            duration: 2
-                        });
-                        
-                        if(i > 0) {
-                            gsap.to(lines[i-1], {
-                                opacity: 0,
-                                y: -30,
-                                duration: 1,
-                                delay: 0.5
-                            });
-                        }
-                    }, i * 3000);
-                });
-                
-                setTimeout(() => {
-                    gsap.to(intro, {
-                        opacity: 0,
-                        duration: 3,
-                        onComplete: () => {
-                            intro.style.display = 'none';
-                            this.showMainMenu();
-                        }
-                    });
-                }, lines.length * 3000 + 2000);
-            }
-
-            showMainMenu() {
-                document.getElementById('menuContainer').classList.add('visible');
-                document.getElementById('humSound').play().catch(() => {});
-            }
-
-            initEventListeners() {
-                // New Game
-                document.getElementById('newGameBtn').addEventListener('click', () => {
-                    this.currentLevel = 0;
-                    this.sanity = 100;
-                    this.startGame();
-                });
-
-                // Continue
-                document.getElementById('continueBtn').addEventListener('click', () => {
-                    const save = this.saveSystem.load();
-                    if(save) {
-                        this.currentLevel = save.level;
-                        this.sanity = save.sanity;
-                        this.startGame();
+                // Menu actions
+                electronAPI.onMenuAction((event, action) => {
+                    switch(action) {
+                        case 'new-game':
+                            this.game.startNewGame();
+                            break;
+                        case 'load-game':
+                            this.showSaveManager();
+                            break;
+                        case 'save-game':
+                            this.quickSave();
+                            break;
                     }
                 });
 
-                // Level Select
-                document.getElementById('levelSelectBtn').addEventListener('click', () => {
-                    this.showLevelSelect();
+                // Graphics settings
+                electronAPI.onGraphicsSetting((event, setting) => {
+                    this.game.setGraphicsQuality(setting);
                 });
 
-                document.getElementById('closeLevelSelect').addEventListener('click', () => {
-                    document.getElementById('levelSelectModal').style.display = 'none';
-                });
-
-                // Action Button
-                document.getElementById('actionButtonMobile').addEventListener('click', () => {
-                    this.interact();
-                });
-
-                // Resize
-                window.addEventListener('resize', () => {
-                    this.camera.aspect = window.innerWidth / window.innerHeight;
-                    this.camera.updateProjectionMatrix();
-                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                // Game ready
+                electronAPI.onGameReady(() => {
+                    console.log('Game ready for Windows');
                 });
             }
 
-            showLevelSelect() {
-                const modal = document.getElementById('levelSelectModal');
-                const list = document.getElementById('levelList');
-                const unlocked = this.saveSystem.getUnlockedLevels();
+            async quickSave() {
+                const saveData = {
+                    level: this.game.currentLevel,
+                    sanity: this.game.sanity,
+                    position: this.game.camera.position,
+                    timestamp: Date.now()
+                };
+
+                const result = await electronAPI.saveGame(saveData);
+                if (result.success) {
+                    this.showNotification('Jogo salvo!', `Save em: ${result.path}`);
+                }
+            }
+
+            async showSaveManager() {
+                const saves = await electronAPI.getSaves();
+                const manager = document.getElementById('saveManager');
+                const list = document.getElementById('saveList');
                 
                 list.innerHTML = '';
-                
-                this.levels.forEach((level, i) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'menu-btn';
-                    btn.style.margin = '0.5rem';
-                    btn.textContent = `LEVEL ${i} - ${level.name}`;
-                    
-                    if(unlocked.includes(i)) {
-                        btn.style.borderColor = '#f0e68c';
-                        btn.onclick = () => {
-                            this.currentLevel = i;
-                            this.sanity = 100;
-                            this.startGame();
-                            modal.style.display = 'none';
-                        };
-                    } else {
-                        btn.style.borderColor = '#333';
-                        btn.style.color = '#333';
-                        btn.disabled = true;
-                        btn.textContent += ' 🔒';
-                    }
-                    
-                    list.appendChild(btn);
+                saves.forEach(save => {
+                    const item = document.createElement('div');
+                    item.className = 'save-item';
+                    item.innerHTML = `
+                        <span>${save.name}</span>
+                        <span>${new Date(save.time).toLocaleString()}</span>
+                        <button class="load-save" data-file="${save.name}">CARREGAR</button>
+                    `;
+                    list.appendChild(item);
                 });
-                
-                modal.style.display = 'block';
+
+                manager.style.display = 'flex';
             }
 
-            startGame() {
-                document.getElementById('menuContainer').classList.remove('visible');
-                document.getElementById('levelSelectModal').style.display = 'none';
-                document.getElementById('gameHud').classList.add('visible');
-                
-                this.gameActive = true;
-                this.createLevel(this.currentLevel);
-                
-                // Sanity drain
-                setInterval(() => {
-                    if(!this.gameActive) return;
-                    
-                    this.sanity = Math.max(0, this.sanity - 0.1);
-                    document.getElementById('sanityFill').style.width = this.sanity + '%';
-                    
-                    if(this.sanity <= 0) {
-                        this.gameOver();
-                    }
-                }, 1000);
-                
-                // Auto-save every 30 seconds
-                setInterval(() => {
-                    if(this.gameActive) {
-                        this.saveSystem.save(this.currentLevel, this.sanity, this.playerPosition);
-                    }
-                }, 30000);
-            }
-
-            interact() {
-                if(!this.gameActive) return;
-                
-                this.sanity = Math.max(0, this.sanity - 2);
-                
-                // Chance to noclip to next level
-                if(Math.random() > 0.8 && this.currentLevel < this.levels.length - 1) {
-                    this.currentLevel++;
-                    this.createLevel(this.currentLevel);
+            showNotification(title, body) {
+                if (electronAPI) {
+                    electronAPI.showNotification(title, body);
                 }
-            }
-
-            gameOver() {
-                this.gameActive = false;
-                alert('YOU BECAME PART OF THE BACKROOMS...');
-                location.reload();
-            }
-
-            update() {
-                if(this.gameActive && this.mobileControls) {
-                    const move = this.mobileControls.getMoveVector();
-                    
-                    if(move.x !== 0 || move.y !== 0) {
-                        // Movimento suave baseado na direção da câmera
-                        const speed = 0.15;
-                        const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
-                        const right = new THREE.Vector3(1, 0, 0).applyQuaternion(this.camera.quaternion);
-                        
-                        this.camera.position.add(forward.multiplyScalar(-move.y * speed));
-                        this.camera.position.add(right.multiplyScalar(move.x * speed));
-                        
-                        // Head bobbing
-                        this.camera.position.y = 1.6 + Math.sin(Date.now() * 0.01) * 0.02;
-                    }
-                }
-            }
-
-            animate() {
-                requestAnimationFrame(() => this.animate());
-                
-                this.update();
-                this.renderer.render(this.scene, this.camera);
             }
         }
 
-        // Initialize
+        // Backrooms Game (adaptado para Windows)
+        class BackroomsGameWindows extends BackroomsGame {
+            constructor() {
+                super();
+                this.saveManager = new WindowsSaveManager(this);
+                this.setupWindowsFeatures();
+            }
+
+            setupWindowsFeatures() {
+                // F11 fullscreen
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'F11') {
+                        e.preventDefault();
+                        if (electronAPI) {
+                            electronAPI.setFullScreen(!document.fullscreenElement);
+                        }
+                    }
+                });
+
+                // Exit button
+                document.getElementById('exitBtn').addEventListener('click', () => {
+                    if (confirm('Deseja sair do jogo?')) {
+                        if (electronAPI) {
+                            electronAPI.send('close-window');
+                        }
+                    }
+                });
+
+                // Load game button
+                document.getElementById('loadGameBtn').addEventListener('click', () => {
+                    this.saveManager.showSaveManager();
+                });
+
+                document.getElementById('closeSaveManager').addEventListener('click', () => {
+                    document.getElementById('saveManager').style.display = 'none';
+                });
+            }
+
+            setGraphicsQuality(quality) {
+                switch(quality) {
+                    case 'low':
+                        this.renderer.setPixelRatio(1);
+                        this.scene.fog.far = 20;
+                        break;
+                    case 'medium':
+                        this.renderer.setPixelRatio(1.5);
+                        this.scene.fog.far = 30;
+                        break;
+                    case 'high':
+                        this.renderer.setPixelRatio(2);
+                        this.scene.fog.far = 50;
+                        break;
+                }
+            }
+
+            startNewGame() {
+                this.currentLevel = 0;
+                this.sanity = 100;
+                this.startGame();
+            }
+        }
+
+        // Iniciar jogo
         document.addEventListener('DOMContentLoaded', () => {
-            const game = new BackroomsGame();
+            const game = new BackroomsGameWindows();
             game.animate();
             window.game = game;
         });
