@@ -17,28 +17,24 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: '18'
       
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Build Windows
+      - name: Install & Build
         run: |
-          npm run build:win
-          npm run build:portable
+          npm install --no-package-lock
+          npm install -g electron-builder
+          npx electron-builder --win
       
-      - name: Upload artifacts
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: Backrooms-Windows
-          path: dist/*.exe
+          path: dist/
       
-      - name: Create Release
+      - name: Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/*.exe
-          generate_release_notes: true
+          files: dist/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
